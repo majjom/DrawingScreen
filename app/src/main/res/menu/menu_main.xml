@@ -1,6 +1,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    <item
+        android:id="@+id/action_draw_points"
+        android:title="@string/action_draw_points"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_toggle_point_layer"
+        android:title="@string/action_toggle_point_layer"
+        android:orderInCategory="200"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_toggle_is_drawing_mode"
+        android:title="@string/action_toggle_is_drawing_mode"
+        android:orderInCategory="300"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_erase_points"
+        android:title="@string/action_erase_points"
+        android:orderInCategory="400"
+        app:showAsAction="never" />
 </menu>

@@ -3,6 +3,10 @@
 
     <string name="app_name">DrawingScreen</string>
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_draw_points">Draw points</string>
+    <string name="action_toggle_point_layer">Toggle point layer</string>
+    <string name="action_toggle_is_drawing_mode">Toggle is drawing mode</string>
+    <string name="action_erase_points">Erase points</string>
+    action_erase_points
 
 </resources>

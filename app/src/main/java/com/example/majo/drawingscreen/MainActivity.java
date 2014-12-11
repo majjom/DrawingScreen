@@ -5,16 +5,24 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.majo.persistence.DrawingPointPersistence;
+import com.example.majo.persistence.IDrawingPointPersistence;
+
 
 public class MainActivity extends ActionBarActivity {
+
+    private DrawingScreenView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final DrawingScreenView imageView = (DrawingScreenView)findViewById(R.id.imageView);
+        imageView = (DrawingScreenView)findViewById(R.id.imageView);
         imageView.setImageAsset("squirrel.jpg");
+
+
+
     }
 
 
@@ -33,7 +41,29 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_draw_points) {
+            IDrawingPointPersistence db = new DrawingPointPersistence();
+            imageView.addPoints(db.getDrawingPoints());
+            imageView.setPointLayerVisible(true);
+
+            return true;
+        }
+
+        if (id == R.id.action_toggle_point_layer) {
+            imageView.togglePointLayerVisible();
+
+            return true;
+        }
+
+        if (id == R.id.action_toggle_is_drawing_mode) {
+            imageView.toggleDrawingMode();
+
+            return true;
+        }
+
+        if (id == R.id.action_erase_points) {
+            imageView.erasePointLayer();
+
             return true;
         }
 
