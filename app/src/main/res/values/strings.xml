@@ -7,6 +7,7 @@
     <string name="action_toggle_point_layer">Toggle point layer</string>
     <string name="action_toggle_is_drawing_mode">Toggle is drawing mode</string>
     <string name="action_erase_points">Erase points</string>
+    <string name="disable_enable_drawing_button_caption">Disable/Enable drawing</string>
     action_erase_points
 
 </resources>

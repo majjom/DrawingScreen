@@ -1,11 +1,64 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:weightSum="1">
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/disableEnableDrawing"
+        android:background="@drawable/drawing_disabled"
+        android:onClick="onDisableEnableDrawingClick"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/disableEnablePathVisibility"
+        android:background="@drawable/path_invisible"
+        android:onClick="onDisableEnablePathVisibilityClick"
+        android:layout_toRightOf="@id/disableEnableDrawing"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/undoPoint"
+        android:background="@drawable/undo_point"
+        android:onClick="onUndoPointClick"
+        android:layout_toRightOf="@id/disableEnablePathVisibility"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/undoDrawing"
+        android:background="@drawable/undo_drawing"
+        android:onClick="onUndoDrawingClick"
+        android:layout_toRightOf="@id/undoPoint"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/submitDrawing"
+        android:background="@drawable/submit_drawing"
+        android:onClick="onSubmitDrawingClick"
+        android:layout_toRightOf="@id/undoDrawing"
+        />
+
+
 
     <com.example.majo.drawingscreen.DrawingScreenView
         android:id="@+id/imageView"
-        android:layout_alignParentTop="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/disableEnableDrawing" />
+
+
+
+
+
 </RelativeLayout>
