@@ -19,7 +19,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         imageView = (DrawingScreenView)findViewById(R.id.imageView);
-        imageView.setImageAsset("squirrel.jpg");
+        imageView.setImageAsset("melchsee.jpg");
 
 
 
