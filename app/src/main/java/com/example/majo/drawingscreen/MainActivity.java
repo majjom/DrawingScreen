@@ -113,4 +113,9 @@ public class MainActivity extends Activity {
     public void onSubmitDrawingClick(View view) {
         this.imageView.submitDrawing();
     }
+
+    public void onDrawPositionClick(View view) {
+        IDrawingPointPersistence db = new DrawingPointPersistence();
+        this.imageView.drawPosition(db.getDrawingPoint());
+    }
 }

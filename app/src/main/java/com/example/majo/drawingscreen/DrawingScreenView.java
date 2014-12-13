@@ -25,6 +25,8 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
     private BitmapLayer drawingPointsBitmap;
     private BitmapLayer allPointsBitmap;
 
+    private BitmapLayer positionBitmap;
+
     // for simulating painting
     //private PointF vPrevious;
     //private PointF vStart;
@@ -106,17 +108,21 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         super.onDraw(canvas);
 
         // show the layers
-        drawBitmapLayer(this.allPointsBitmap, canvas);
-        drawBitmapLayer(this.drawingPointsBitmap, canvas);
+        if (isImageReady()) {
+            canvas.save();
+            canvas.translate(sourceToViewCoord(0, 0).x, sourceToViewCoord(0, 0).y);
+            canvas.scale(getScale(), getScale());
+
+            drawBitmapLayer(this.allPointsBitmap, canvas);
+            drawBitmapLayer(this.drawingPointsBitmap, canvas);
+            drawBitmapLayer(this.positionBitmap, canvas);
+            canvas.restore();
+        }
     }
 
     private void drawBitmapLayer(BitmapLayer bitmapLayer, Canvas canvas){
         if (bitmapLayer != null && bitmapLayer.isVisible()) {
-            canvas.save();
-            canvas.translate(sourceToViewCoord(0, 0).x, sourceToViewCoord(0, 0).y);
-            canvas.scale(getScale(), getScale());
             canvas.drawBitmap(bitmapLayer.getBitmap(), 0, 0, null);
-            canvas.restore();
         }
     }
 
@@ -210,6 +216,14 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
 
+
+
+    public void drawPosition(DrawingPoint point){
+        initiatePositionBitmapLayer();
+        this.positionBitmap.removeAllPoints();
+        this.positionBitmap.addPoint(point);
+        invalidate();
+    }
 
 
 
@@ -318,6 +332,17 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
             if (getSWidth() > 0 && getSHeight() > 0) {
                 this.allPointsBitmap = new BitmapLayer(getSWidth(), getSHeight());
                 this.allPointsBitmap.setPaintColor(Color.MAGENTA);
+            }
+        }
+    }
+
+    private void initiatePositionBitmapLayer(){
+        // if the bitmap is not initiated yet
+        if (this.positionBitmap == null) {
+            // but only when the background bitmap is already loaded
+            if (getSWidth() > 0 && getSHeight() > 0) {
+                this.positionBitmap = new BitmapLayer(getSWidth(), getSHeight());
+                this.positionBitmap.setPaintColor(Color.RED);
             }
         }
     }

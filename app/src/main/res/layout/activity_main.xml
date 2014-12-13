@@ -49,6 +49,15 @@
         android:layout_toRightOf="@id/undoDrawing"
         />
 
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/drawPosition"
+        android:background="@drawable/draw_position"
+        android:onClick="onDrawPositionClick"
+        android:layout_toRightOf="@id/submitDrawing"
+        />
+
 
 
     <com.example.majo.drawingscreen.DrawingScreenView
