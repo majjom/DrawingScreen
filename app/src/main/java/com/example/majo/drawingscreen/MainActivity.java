@@ -1,7 +1,6 @@
 package com.example.majo.drawingscreen;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,11 +11,19 @@ import android.widget.ImageButton;
 
 import com.example.majo.persistence.DrawingPointPersistence;
 import com.example.majo.persistence.IDrawingPointPersistence;
+import com.example.majo.position.IPositionService;
+import com.example.majo.position.PositionService;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
 
     private DrawingScreenView imageView;
+    private DrawingPointPersistence persistence;
+
+    // todo put this away
+    private int index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +36,7 @@ public class MainActivity extends Activity {
         imageView = (DrawingScreenView)findViewById(R.id.imageView);
         imageView.setImageAsset("melchsee.jpg");
 
+        persistence = new DrawingPointPersistence(this);
 
 
     }
@@ -50,7 +58,7 @@ public class MainActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_draw_points) {
-            IDrawingPointPersistence db = new DrawingPointPersistence();
+            //IDrawingPointPersistence db = new RandomDrawingPointPersistence();
             //imageView.addPoints(db.getDrawingPoints());
             //imageView.setPointLayerVisible(true);
 
@@ -78,6 +86,21 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (this.persistence!=null){
+            this.persistence.onDestroy();
+        }
+    }
+
+
+
+
+
+
+
     public void onDisableEnableDrawingClick(View view) {
         ImageButton btn = (ImageButton)findViewById(R.id.disableEnableDrawing);
         if (this.imageView.isDrawingMode()){
@@ -96,7 +119,7 @@ public class MainActivity extends Activity {
             btn.setBackgroundResource(R.drawable.path_invisible);
             this.imageView.toggleAllPointsVisible();
         } else {
-            this.imageView.loadAllPoints();
+            this.imageView.loadAllPoints(this.persistence);
             btn.setBackgroundResource(R.drawable.path_visible);
             //this.imageView.toggleAllPointsVisible();
         }
@@ -111,11 +134,31 @@ public class MainActivity extends Activity {
     }
 
     public void onSubmitDrawingClick(View view) {
-        this.imageView.submitDrawing();
+        this.imageView.submitDrawing(this.persistence);
     }
 
     public void onDrawPositionClick(View view) {
-        IDrawingPointPersistence db = new DrawingPointPersistence();
-        this.imageView.drawPosition(db.getDrawingPoint());
+        ArrayList<DrawingPoint> points =  this.persistence.getDrawingPoints();
+        if (points.size() == 0) {
+            this.imageView.setPositionVisibility(false);
+            return;
+        } else
+        {
+            this.imageView.setPositionVisibility(true);
+        }
+
+
+        if (index > points.size() - 1){
+            index = 0;
+        }
+        this.imageView.drawPosition(points.get(index));
+        index++;
+
+    }
+
+    public void onDeleteAllStoredPointsClick(View view) {
+        this.persistence.deleteAllDrawingPoints();
+        this.imageView.clearAllPoints();
+        onDrawPositionClick(view);
     }
 }

@@ -52,11 +52,23 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/deleteAllStoredPoints"
+        android:background="@drawable/delete_saved_data"
+        android:onClick="onDeleteAllStoredPointsClick"
+        android:layout_toRightOf="@id/submitDrawing"
+        />
+
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/drawPosition"
         android:background="@drawable/draw_position"
         android:onClick="onDrawPositionClick"
-        android:layout_toRightOf="@id/submitDrawing"
+        android:layout_toRightOf="@id/deleteAllStoredPoints"
         />
+
+
 
 
 

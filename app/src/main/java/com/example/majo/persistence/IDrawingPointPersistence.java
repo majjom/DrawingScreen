@@ -9,5 +9,9 @@ import java.util.ArrayList;
  */
 public interface IDrawingPointPersistence {
     public ArrayList<DrawingPoint> getDrawingPoints();
-    public DrawingPoint getDrawingPoint();
+
+    public void addDrawingPoints(ArrayList<DrawingPoint> points);
+
+    public void deleteAllDrawingPoints();
+
 }

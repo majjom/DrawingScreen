@@ -3,14 +3,13 @@ package com.example.majo.drawingscreen;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.example.majo.persistence.DrawingPointPersistence;
+import com.example.majo.persistence.RandomDrawingPointPersistence;
 import com.example.majo.persistence.IDrawingPointPersistence;
 
 import static com.example.majo.drawingscreen.FingerGesture.*;
@@ -24,14 +23,12 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
     private BitmapLayer drawingPointsBitmap;
     private BitmapLayer allPointsBitmap;
-
     private BitmapLayer positionBitmap;
 
     // for simulating painting
     //private PointF vPrevious;
     //private PointF vStart;
     private int strokeWidth = 5;
-
 
 
     public DrawingScreenView(Context context) {
@@ -51,6 +48,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         setOnTouchListener(this);
         float density = getResources().getDisplayMetrics().densityDpi;
         setDebug(true);
+
     }
 
 
@@ -225,6 +223,13 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         invalidate();
     }
 
+    public void setPositionVisibility(boolean isVisible){
+        initiatePositionBitmapLayer();
+        this.positionBitmap.setVisibility(isVisible);
+        invalidate();
+    }
+
+
 
 
 
@@ -248,10 +253,11 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
 
-    public void submitDrawing(){
+    public void submitDrawing(IDrawingPointPersistence persistence){
         initiateAllPointsBitmapLayer();
         initiateDrawingPointsBitmapLayer();
         this.allPointsBitmap.addPoints(this.drawingPointsBitmap.getPoints());
+        persistence.addDrawingPoints(this.drawingPointsBitmap.getPoints());
         this.drawingPointsBitmap.removeAllPoints();
         setAllPointsVisible(true);
         invalidate();
@@ -274,15 +280,19 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         invalidate();
     }
 
-    public void loadAllPoints(){
-        IDrawingPointPersistence db = new DrawingPointPersistence();
+    public void loadAllPoints(IDrawingPointPersistence persistence){
         setShowAllPoints(true);
-        //this.allPointsBitmap.addPoints(db.getDrawingPoints());
+        this.allPointsBitmap.addPoints(persistence.getDrawingPoints());
     }
 
     public void toggleShowAllPoints(){
         initiateAllPointsBitmapLayer();
         setShowAllPoints(!this.allPointsBitmap.isVisible());
+    }
+
+    public void clearAllPoints(){
+        initiateAllPointsBitmapLayer();
+        this.allPointsBitmap.clean();
     }
 
     public void setShowAllPoints(boolean showAllPoints){
