@@ -13,4 +13,6 @@ public interface IMappedPointsPersistence {
 
     public void addPoints(int mapId, ArrayList<MappedPoint> points);
 
+    public void deleteAllPoints(int mapId);
+
 }

@@ -12,4 +12,6 @@ public interface IGeoLocationPersistence {
     public ArrayList<GeoLocation> getAllPoints(int geoSessionId);
 
     public void addPoints(int geoSessionId, ArrayList<GeoLocation> points);
+
+    public void deleteAllPoints(int geoSessionId);
 }

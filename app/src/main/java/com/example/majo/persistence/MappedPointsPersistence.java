@@ -22,7 +22,7 @@ public class MappedPointsPersistence extends DatabaseConnection implements IMapp
         ArrayList<MappedPoint> result = new ArrayList<>();
 
         String[] columns = new String[] { "_id", MyDatabaseHelper.COL_MP_DRAWING_X, MyDatabaseHelper.COL_MP_DRAWING_Y, MyDatabaseHelper.COL_MP_DRAWING_RADIUS
-                , MyDatabaseHelper.COL_MP_GEO_LAT, MyDatabaseHelper.COL_MP_GEO_LON, MyDatabaseHelper.COL_MP_GEO_ALT};
+                , MyDatabaseHelper.COL_MP_GEO_LAT, MyDatabaseHelper.COL_MP_GEO_LON, MyDatabaseHelper.COL_MP_GEO_ALT, MyDatabaseHelper.COL_MP_GEO_RAD};
         Cursor cur = db.query(MyDatabaseHelper.TAB_MAPPED_POINTS, columns, null, null, null, null, "_id");
 
         while(cur.moveToNext()){
@@ -67,5 +67,10 @@ public class MappedPointsPersistence extends DatabaseConnection implements IMapp
 
             db.insert(MyDatabaseHelper.TAB_MAPPED_POINTS, null, cv);
         }
+    }
+
+    @Override
+    public void deleteAllPoints(int mapId) {
+        db.delete(MyDatabaseHelper.TAB_MAPPED_POINTS, null, null);
     }
 }

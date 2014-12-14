@@ -1,7 +1,6 @@
 package com.example.majo.position;
 
 import android.location.Location;
-import android.os.Bundle;
 
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.MappedPoint;
@@ -14,35 +13,32 @@ import java.util.ArrayList;
  */
 public class PositionService implements IPositionService {
 
-    private final String RADIUS = "Radius";
-
     private IMappedPointsPersistence db;
 
-    DrawingPoint lastPosition;
-    ArrayList<MPLComposite> cache;
-
+    private DrawingPoint lastPosition;
+    private ArrayList<MPLComposite> cache;
 
     public PositionService(IMappedPointsPersistence db){
         this.db = db;
     }
 
-
     @Override
-    public DrawingPoint getCurrentPosition() {
+    public DrawingPoint getLastPosition() {
         return lastPosition;
     }
 
     @Override
     public DrawingPoint getCurrentPosition(Location location) {
         lastPosition = convertToDrawingPoint(firstOrDefault(getMatchingPoints(location)));
-        return getCurrentPosition();
+        return getLastPosition();
     }
+
+
 
     private MappedPoint firstOrDefault(ArrayList<MappedPoint> points){
         if ((points == null) || (points.size() <= 0)) return null;
-        return points.get(1);
+        return points.get(0);
     }
-
 
     private ArrayList<MappedPoint> getMatchingPoints(Location location) {
         ArrayList<MappedPoint> result = new ArrayList<>();
@@ -63,6 +59,7 @@ public class PositionService implements IPositionService {
     }
 
     private DrawingPoint convertToDrawingPoint(MappedPoint point){
+        if (point == null) return null;
         return new DrawingPoint(point.drawingX, point.drawingY, point.drawingRadius);
     }
 
@@ -80,9 +77,11 @@ public class PositionService implements IPositionService {
         result.setLongitude(point.geoLongitude);
         result.setAltitude(point.geoAltitude);
 
+        /*
         Bundle bundle = new Bundle();
         bundle.putDouble(RADIUS, point.geoRadius);
         result.setExtras(bundle);
+        */
 
         return result;
     }

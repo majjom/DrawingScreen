@@ -11,12 +11,12 @@ public class DummyPositionService implements IPositionService {
 
 
     @Override
-    public DrawingPoint getCurrentPosition() {
+    public DrawingPoint getLastPosition() {
         return new DrawingPoint(100, 100, 40);
     }
 
     @Override
     public DrawingPoint getCurrentPosition(Location location) {
-        return getCurrentPosition();
+        return getLastPosition();
     }
 }

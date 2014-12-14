@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "mydb";
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
 
     public static final String TAB_DRAWING_POINTS = "DrawingPoints";
     public static final String COL_DP_X = "X";
@@ -55,6 +55,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(String.format("DROP TABLE IF EXISTS %s", TAB_DRAWING_POINTS));
+        db.execSQL(String.format("DROP TABLE IF EXISTS %s", TAB_MAPPED_POINTS));
+        db.execSQL(String.format("DROP TABLE IF EXISTS %s", TAB_GEO_LOCATIONS));
         onCreate(db);
     }
 }
