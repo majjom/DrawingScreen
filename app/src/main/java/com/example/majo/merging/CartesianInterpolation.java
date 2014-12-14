@@ -19,23 +19,35 @@ public class CartesianInterpolation {
         ArrayList<CartesianPoint> result = new ArrayList<>();
         if (points == null) return null;
 
+
         // special border cases
         if (points.size() == 0) {
             return result;
         }
-        if (points.size() == 1) {
-            result.add(points.get(0)); // first - the only one
-            result.add(points.get(0)); // last - the only one
+        if (count == 0) {
             return result;
         }
+
+        if (points.size() == 1) {
+            result.add(points.get(0)); // first - the only one
+            return result;
+        }
+        if (count == 1){
+            result.add(points.get(0)); // first - the only one
+            return result;
+        }
+
         if (count <= 2){
-            result.add(points.get(0)); //fist
-            result.add(points.get(points.size() - 1)); // last
+            if (points.size() > 0) {
+                result.add(points.get(0)); //fist
+                result.add(points.get(points.size() - 1)); // last
+            }
             return result;
         }
 
         // general case
-        int distance = Math.round(getPathSize(points) / count);
+        int pathSize = getPathSize(points);
+        int distance = Math.round(pathSize / (count - 1)); // fist and last are going to result automatically
         CartesianPoint first = points.remove(0);
         result.add(first); // the first point is always in
         PPSComposite intermResult = getNextPoint(first, distance, points);
@@ -43,8 +55,14 @@ public class CartesianInterpolation {
             if (intermResult.point != null){
                 result.add(intermResult.point);
             }
-            intermResult = getNextPoint(first, distance, intermResult.leftoverPoints);
+            intermResult = getNextPoint(intermResult.point, distance, intermResult.leftoverPoints);
         }
+
+        // add last point, if the point count of result is already met, than remove the last calculated one and interchange with the last point
+        if (result.size() == count){
+            result.remove(result.size() - 1);
+        }
+        result.add(points.get(points.size() - 1));
 
         return result;
     }
@@ -94,14 +112,15 @@ public class CartesianInterpolation {
         if (a == 0) return result;
 
         if (determinant > 0){
-            double t1 = (-1 * b + Math.sqrt(determinant)) / 2 * a;
-            double t2 = (-1 * b - Math.sqrt(determinant)) / 2 * a;
+            double t1 = (-1 * b + Math.sqrt(determinant)) / (2 * a);
+            double t2 = (-1 * b - Math.sqrt(determinant)) / (2 * a);
 
-            // if the spolocny bod lezi na usecke A-B
-            if ((t1 >= -1) && (t1 <=1)){
+            // if the spolocny bod lezi na usecke A->B (0,1) nie naopak (-1,0), A startovaci bod
+            if ((t1 >= 0) && (t1 <=1)){
                 result.add(getLineSolution(linePointA, linePointB, t1));
             }
-            if ((t2 >= -1) && (t2 <=1)){
+            // if the spolocny bod lezi na usecke A->B (0,1) nie naopak (-1,0), A startovaci bod
+            if ((t2 >= 0) && (t2 <=1)){
                 result.add(getLineSolution(linePointA, linePointB, t2));
             }
         } else {
@@ -132,7 +151,7 @@ public class CartesianInterpolation {
         double a = get_a(linePointA, linePointB, circleCentre, radius);
         double b = get_b(linePointA, linePointB, circleCentre, radius);
         double c = get_c(linePointA, linePointB, circleCentre, radius);
-        return Math.sqrt(b*b - 4*a*c);
+        return b*b - 4*a*c;
     }
 
     /**
@@ -168,7 +187,7 @@ public class CartesianInterpolation {
 
     private static double getDistance(CartesianPoint point1, CartesianPoint point2){
         if ((point1 == null) || (point2 == null)) return 0;
-        return (int)Math.abs(Math.round(Math.sqrt((Math.pow((point2.x - point1.x), 2) + Math.pow((point2.y - point1.y), 2)))));
+        return (int)Math.abs(Math.round(Math.sqrt(Math.pow((point2.x - point1.x), 2) + Math.pow((point2.y - point1.y), 2))));
     }
 
 }

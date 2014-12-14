@@ -6,4 +6,12 @@ package com.example.majo.merging;
 public class CartesianPoint {
     public int x;
     public int y;
+
+    public CartesianPoint(){
+
+    }
+    public CartesianPoint(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
 }
