@@ -9,10 +9,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 
+import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.persistence.DrawingPointPersistence;
-import com.example.majo.persistence.IDrawingPointPersistence;
-import com.example.majo.position.IPositionService;
-import com.example.majo.position.PositionService;
 
 import java.util.ArrayList;
 
@@ -59,7 +57,7 @@ public class MainActivity extends Activity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_draw_points) {
             //IDrawingPointPersistence db = new RandomDrawingPointPersistence();
-            //imageView.addPoints(db.getDrawingPoints());
+            //imageView.addPoints(db.getAllPoints());
             //imageView.setPointLayerVisible(true);
 
             return true;
@@ -138,7 +136,7 @@ public class MainActivity extends Activity {
     }
 
     public void onDrawPositionClick(View view) {
-        ArrayList<DrawingPoint> points =  this.persistence.getDrawingPoints();
+        ArrayList<DrawingPoint> points =  this.persistence.getAllPoints();
         if (points.size() == 0) {
             this.imageView.setPositionVisibility(false);
             return;
@@ -157,7 +155,7 @@ public class MainActivity extends Activity {
     }
 
     public void onDeleteAllStoredPointsClick(View view) {
-        this.persistence.deleteAllDrawingPoints();
+        this.persistence.deleteAllPoints();
         this.imageView.clearAllPoints();
         onDrawPositionClick(view);
     }

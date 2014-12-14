@@ -9,7 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.example.majo.persistence.RandomDrawingPointPersistence;
+import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.persistence.IDrawingPointPersistence;
 
 import static com.example.majo.drawingscreen.FingerGesture.*;
@@ -257,7 +257,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         initiateAllPointsBitmapLayer();
         initiateDrawingPointsBitmapLayer();
         this.allPointsBitmap.addPoints(this.drawingPointsBitmap.getPoints());
-        persistence.addDrawingPoints(this.drawingPointsBitmap.getPoints());
+        persistence.addPoints(this.drawingPointsBitmap.getPoints());
         this.drawingPointsBitmap.removeAllPoints();
         setAllPointsVisible(true);
         invalidate();
@@ -282,7 +282,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
     public void loadAllPoints(IDrawingPointPersistence persistence){
         setShowAllPoints(true);
-        this.allPointsBitmap.addPoints(persistence.getDrawingPoints());
+        this.allPointsBitmap.addPoints(persistence.getAllPoints());
     }
 
     public void toggleShowAllPoints(){

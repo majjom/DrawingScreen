@@ -1,4 +1,4 @@
-package com.example.majo.drawingscreen;
+package com.example.majo.BusinessObjects;
 
 /**
  * Created by majo on 11-Dec-14.

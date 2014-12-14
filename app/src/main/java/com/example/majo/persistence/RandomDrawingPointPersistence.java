@@ -1,6 +1,6 @@
 package com.example.majo.persistence;
 
-import com.example.majo.drawingscreen.DrawingPoint;
+import com.example.majo.BusinessObjects.DrawingPoint;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -10,7 +10,7 @@ public class RandomDrawingPointPersistence implements IDrawingPointPersistence {
     private Random rnd = new Random();
 
     @Override
-    public ArrayList<DrawingPoint> getDrawingPoints() {
+    public ArrayList<DrawingPoint> getAllPoints() {
         ArrayList<DrawingPoint> result = new ArrayList<DrawingPoint>();
 
         DrawingPoint previous = getRandomDrawingPoint(0, 0);
@@ -24,12 +24,12 @@ public class RandomDrawingPointPersistence implements IDrawingPointPersistence {
     }
 
     @Override
-    public void addDrawingPoints(ArrayList<DrawingPoint> points) {
+    public void addPoints(ArrayList<DrawingPoint> points) {
         // TODO
     }
 
     @Override
-    public void deleteAllDrawingPoints() {
+    public void deleteAllPoints() {
 
     }
 

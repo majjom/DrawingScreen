@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.example.majo.BusinessObjects.DrawingPoint;
+
 import java.util.ArrayList;
 
 /**
