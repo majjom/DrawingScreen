@@ -1,6 +1,7 @@
 package com.example.majo.drawingscreen;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -158,5 +159,10 @@ public class MainActivity extends Activity {
         this.persistence.deleteAllPoints();
         this.imageView.clearAllPoints();
         onDrawPositionClick(view);
+    }
+
+    public void onDrawPointsListClick(View view) {
+        Intent intent = new Intent(this, DrawingPointsListActivity.class);
+        startActivity(intent);
     }
 }

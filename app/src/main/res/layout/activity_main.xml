@@ -43,10 +43,20 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/drawPointsList"
+        android:background="@drawable/draw_points_list"
+        android:onClick="onDrawPointsListClick"
+        android:layout_toRightOf="@id/undoDrawing"
+        />
+
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/submitDrawing"
         android:background="@drawable/submit_drawing"
         android:onClick="onSubmitDrawingClick"
-        android:layout_toRightOf="@id/undoDrawing"
+        android:layout_toRightOf="@id/drawPointsList"
         />
 
     <ImageButton
@@ -67,6 +77,7 @@
         android:onClick="onDrawPositionClick"
         android:layout_toRightOf="@id/deleteAllStoredPoints"
         />
+
 
 
 

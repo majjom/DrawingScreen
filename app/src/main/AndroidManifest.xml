@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".DrawingPointsListActivity"
+            android:label="@string/title_activity_drawing_points_list" >
+        </activity>
     </application>
 
 </manifest>

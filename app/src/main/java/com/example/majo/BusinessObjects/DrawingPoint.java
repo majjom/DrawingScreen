@@ -13,4 +13,9 @@ public class DrawingPoint {
         this.y = y;
         this.radius = radius;
     }
+
+    @Override
+    public String toString() {
+        return String.format("x:%s y:%s r:%s", x, y, radius);
+    }
 }
