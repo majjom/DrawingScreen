@@ -9,8 +9,10 @@ import com.example.majo.BusinessObjects.MappedPoint;
 import com.example.majo.drawingscreen.MainActivity;
 import com.example.majo.persistence.DrawingPointPersistence;
 import com.example.majo.persistence.GeoLocationPersistence;
+import com.example.majo.persistence.GeoSessionPersistence;
 import com.example.majo.persistence.IDrawingPointPersistence;
 import com.example.majo.persistence.IGeoLocationPersistence;
+import com.example.majo.persistence.IGeoSessionPersistence;
 import com.example.majo.persistence.IMappedPointsPersistence;
 import com.example.majo.persistence.MappedPointsPersistence;
 
@@ -102,7 +104,8 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<MainActivi
     @SmallTest
     public void testGeoLocationPersistence(){
         // arrange
-        IGeoLocationPersistence db = new GeoLocationPersistence(activity);
+        IGeoSessionPersistence dbSess = new GeoSessionPersistence(activity);
+        IGeoLocationPersistence dbLoc = new GeoLocationPersistence(activity);
 
         int geoSessionId = 0;
 

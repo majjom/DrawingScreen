@@ -22,8 +22,8 @@ public class DrawingPointPersistence extends DatabaseConnection implements IDraw
     public ArrayList<DrawingPoint> getAllPoints() {
         ArrayList<DrawingPoint> result = new ArrayList<>();
 
-        String[] columns = new String[] { "_id", MyDatabaseHelper.COL_DP_X, MyDatabaseHelper.COL_DP_Y, MyDatabaseHelper.COL_DP_RADIUS};
-        Cursor cur = db.query(MyDatabaseHelper.TAB_DRAWING_POINTS, columns, null, null, null, null, "_id");
+        String[] columns = new String[] { MyDatabaseHelper.COL_DP_ID, MyDatabaseHelper.COL_DP_X, MyDatabaseHelper.COL_DP_Y, MyDatabaseHelper.COL_DP_RADIUS};
+        Cursor cur = db.query(MyDatabaseHelper.TAB_DRAWING_POINTS, columns, null, null, null, null, MyDatabaseHelper.COL_DP_ID);
 
         while(cur.moveToNext()){
             float x = ConversionHelper.intToDrawingPoint(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_DP_X)));

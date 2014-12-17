@@ -22,16 +22,18 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
     public ArrayList<GeoLocation> getAllPoints(int geoSessionId) {
         ArrayList<GeoLocation> result = new ArrayList<>();
 
-        String[] columns = new String[] { "_id", MyDatabaseHelper.COL_GL_LATITUDE, MyDatabaseHelper.COL_GL_LONGITUDE, MyDatabaseHelper.COL_GL_ALTITUDE, MyDatabaseHelper.COL_GL_RADIUS };
-        Cursor cur = db.query(MyDatabaseHelper.TAB_GEO_LOCATIONS, columns, null, null, null, null, "_id");
+        String[] columns = new String[] { MyDatabaseHelper.COL_GL_ID, MyDatabaseHelper.COL_GL_LATITUDE, MyDatabaseHelper.COL_GL_LONGITUDE, MyDatabaseHelper.COL_GL_ALTITUDE, MyDatabaseHelper.COL_GL_RADIUS };
+        Cursor cur = db.query(MyDatabaseHelper.TAB_GEO_LOCATIONS, columns, String.format("%s=?", MyDatabaseHelper.COL_GL_GEO_SESSION_ID), new String[] { String.valueOf(geoSessionId) }, null, null, MyDatabaseHelper.COL_GL_ID);
+
 
         while(cur.moveToNext()){
+            int id = cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_GL_ID));
             double geoLat = ConversionHelper.intToGeoLocation(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_GL_LATITUDE)));
             double geoLon = ConversionHelper.intToGeoLocation(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_GL_LONGITUDE)));
             double geoAlt = ConversionHelper.intToGeoLocation(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_GL_ALTITUDE)));
             double geoRad = ConversionHelper.intToGeoLocation(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_GL_RADIUS)));
 
-            result.add(new GeoLocation(geoLat, geoLon, geoAlt, geoRad));
+            result.add(new GeoLocation(id, geoLat, geoLon, geoAlt, geoRad));
         }
 
         cur.close();
@@ -48,6 +50,7 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
             int geoAlt = ConversionHelper.geoLocationToInt(point.altitude);
             int geoRad = ConversionHelper.geoLocationToInt(point.radius);
 
+            cv.put(MyDatabaseHelper.COL_GL_GEO_SESSION_ID, geoSessionId);
             cv.put(MyDatabaseHelper.COL_GL_LATITUDE, geoLat);
             cv.put(MyDatabaseHelper.COL_GL_LONGITUDE, geoLon);
             cv.put(MyDatabaseHelper.COL_GL_ALTITUDE, geoAlt);
