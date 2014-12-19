@@ -26,7 +26,7 @@ public class DrawingPointsListActivity extends ActionBarActivity {
         drawingPoints = (ListView)findViewById(R.id.drawingPoints);
         db = new DrawingPointPersistence(this);
 
-        ArrayAdapter<DrawingPoint> aa = new ArrayAdapter<DrawingPoint>(this, android.R.layout.simple_list_item_1, db.getAllPoints());
+        ArrayAdapter<DrawingPoint> aa = new ArrayAdapter<DrawingPoint>(this, android.R.layout.simple_list_item_1, db.getAllPoints(0));
         drawingPoints.setAdapter(aa);
     }
 

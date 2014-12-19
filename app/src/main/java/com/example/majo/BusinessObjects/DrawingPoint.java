@@ -3,7 +3,7 @@ package com.example.majo.BusinessObjects;
 /**
  * Created by majo on 11-Dec-14.
  */
-public class DrawingPoint {
+public class DrawingPoint extends PersistedObject {
     public float x;
     public float y;
     public float radius;

@@ -15,4 +15,6 @@ public interface IGeoSessionPersistence {
     public void addSessions(int mapId, ArrayList<GeoSession> sessions);
 
     public void deleteAllSessions(int mapId);
+
+    public void deleteSession(GeoSession geoSession);
 }

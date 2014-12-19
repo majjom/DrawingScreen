@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.MappedPoint;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class MappedPointsPersistence extends DatabaseConnection implements IMapp
 
         String[] columns = new String[] { MyDatabaseHelper.COL_MP_ID, MyDatabaseHelper.COL_MP_DRAWING_X, MyDatabaseHelper.COL_MP_DRAWING_Y, MyDatabaseHelper.COL_MP_DRAWING_RADIUS
                 , MyDatabaseHelper.COL_MP_GEO_LAT, MyDatabaseHelper.COL_MP_GEO_LON, MyDatabaseHelper.COL_MP_GEO_ALT, MyDatabaseHelper.COL_MP_GEO_RAD};
-        Cursor cur = db.query(MyDatabaseHelper.TAB_MAPPED_POINTS, columns, null, null, null, null, MyDatabaseHelper.COL_MP_ID);
+        Cursor cur = db.query(MyDatabaseHelper.TAB_MAPPED_POINTS, columns, String.format("%s=?", MyDatabaseHelper.COL_MP_MAP_ID), new String[] { String.valueOf(mapId) }, null, null, MyDatabaseHelper.COL_MP_ID);
 
         while(cur.moveToNext()){
             float drawingX = ConversionHelper.intToDrawingPoint(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_MP_DRAWING_X)));
@@ -45,7 +46,7 @@ public class MappedPointsPersistence extends DatabaseConnection implements IMapp
     @Override
     public void addPoints(int mapId, ArrayList<MappedPoint> points) {
         for (MappedPoint point : points){
-            ContentValues cv = new ContentValues(7);
+            ContentValues cv = new ContentValues(8);
 
             int drawingX = ConversionHelper.drawingPointToInt(point.drawingX);
             int drawingY = ConversionHelper.drawingPointToInt(point.drawingY);
@@ -56,6 +57,7 @@ public class MappedPointsPersistence extends DatabaseConnection implements IMapp
             int geoAlt = ConversionHelper.geoLocationToInt(point.geoAltitude);
             int geoRad = ConversionHelper.geoLocationToInt(point.geoRadius);
 
+            cv.put(MyDatabaseHelper.COL_MP_MAP_ID, mapId);
             cv.put(MyDatabaseHelper.COL_MP_DRAWING_X, drawingX);
             cv.put(MyDatabaseHelper.COL_MP_DRAWING_Y, drawingY);
             cv.put(MyDatabaseHelper.COL_MP_DRAWING_RADIUS, drawingRadius);
@@ -71,6 +73,11 @@ public class MappedPointsPersistence extends DatabaseConnection implements IMapp
 
     @Override
     public void deleteAllPoints(int mapId) {
-        db.delete(MyDatabaseHelper.TAB_MAPPED_POINTS, null, null);
+        db.delete(MyDatabaseHelper.TAB_MAPPED_POINTS, String.format("%s=?", MyDatabaseHelper.COL_MP_MAP_ID), new String[] { String.valueOf(mapId) });
+    }
+
+    @Override
+    public void deleteMappedPoint(MappedPoint mappedPoint){
+        db.delete(MyDatabaseHelper.TAB_MAPPED_POINTS, String.format("%s=?", MyDatabaseHelper.COL_MP_ID), new String[] { String.valueOf(mappedPoint.id) });
     }
 }

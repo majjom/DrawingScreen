@@ -19,11 +19,11 @@ public class DrawingPointPersistence extends DatabaseConnection implements IDraw
     }
 
     @Override
-    public ArrayList<DrawingPoint> getAllPoints() {
+    public ArrayList<DrawingPoint> getAllPoints(int mapId) {
         ArrayList<DrawingPoint> result = new ArrayList<>();
 
         String[] columns = new String[] { MyDatabaseHelper.COL_DP_ID, MyDatabaseHelper.COL_DP_X, MyDatabaseHelper.COL_DP_Y, MyDatabaseHelper.COL_DP_RADIUS};
-        Cursor cur = db.query(MyDatabaseHelper.TAB_DRAWING_POINTS, columns, null, null, null, null, MyDatabaseHelper.COL_DP_ID);
+        Cursor cur = db.query(MyDatabaseHelper.TAB_DRAWING_POINTS, columns, String.format("%s=?", MyDatabaseHelper.COL_DP_MAP_ID), new String[] { String.valueOf(mapId) }, null, null, MyDatabaseHelper.COL_DP_ID);
 
         while(cur.moveToNext()){
             float x = ConversionHelper.intToDrawingPoint(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_DP_X)));
@@ -37,22 +37,31 @@ public class DrawingPointPersistence extends DatabaseConnection implements IDraw
     }
 
     @Override
-    public void addPoints(ArrayList<DrawingPoint> points) {
+    public void addPoints(int mapId, ArrayList<DrawingPoint> points) {
         for (DrawingPoint point : points){
-            ContentValues cv = new ContentValues(3);
+            ContentValues cv = new ContentValues(4);
+
             int x = ConversionHelper.drawingPointToInt(point.x);
             int y = ConversionHelper.drawingPointToInt(point.y);
             int radius = ConversionHelper.drawingPointToInt(point.radius);
+
+            cv.put(MyDatabaseHelper.COL_DP_MAP_ID, mapId);
             cv.put(MyDatabaseHelper.COL_DP_X, x);
             cv.put(MyDatabaseHelper.COL_DP_Y, y);
             cv.put(MyDatabaseHelper.COL_DP_RADIUS, radius);
+
             db.insert(MyDatabaseHelper.TAB_DRAWING_POINTS, null, cv);
         }
     }
 
     @Override
-    public void deleteAllPoints() {
-        db.delete(MyDatabaseHelper.TAB_DRAWING_POINTS, null, null);
+    public void deleteAllPoints(int mapId) {
+        db.delete(MyDatabaseHelper.TAB_DRAWING_POINTS, String.format("%s=?", MyDatabaseHelper.COL_DP_MAP_ID), new String[] { String.valueOf(mapId) });
+    }
+
+    @Override
+    public void deleteDrawingPoint(DrawingPoint drawingPoint){
+        db.delete(MyDatabaseHelper.TAB_DRAWING_POINTS, String.format("%s=?", MyDatabaseHelper.COL_DP_ID), new String[] { String.valueOf(drawingPoint.id) });
     }
 
 

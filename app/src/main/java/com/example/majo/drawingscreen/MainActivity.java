@@ -58,7 +58,7 @@ public class MainActivity extends Activity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_draw_points) {
             //IDrawingPointPersistence db = new RandomDrawingPointPersistence();
-            //imageView.addPoints(db.getAllPoints());
+            //imageView.addLocations(db.getAllLocations());
             //imageView.setPointLayerVisible(true);
 
             return true;
@@ -137,7 +137,7 @@ public class MainActivity extends Activity {
     }
 
     public void onDrawPositionClick(View view) {
-        ArrayList<DrawingPoint> points =  this.persistence.getAllPoints();
+        ArrayList<DrawingPoint> points =  this.persistence.getAllPoints(0);
         if (points.size() == 0) {
             this.imageView.setPositionVisibility(false);
             return;
@@ -156,7 +156,7 @@ public class MainActivity extends Activity {
     }
 
     public void onDeleteAllStoredPointsClick(View view) {
-        this.persistence.deleteAllPoints();
+        this.persistence.deleteAllPoints(0);
         this.imageView.clearAllPoints();
         onDrawPositionClick(view);
     }

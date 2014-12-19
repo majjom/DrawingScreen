@@ -19,7 +19,7 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
     }
 
     @Override
-    public ArrayList<GeoLocation> getAllPoints(int geoSessionId) {
+    public ArrayList<GeoLocation> getAllLocations(int geoSessionId) {
         ArrayList<GeoLocation> result = new ArrayList<>();
 
         String[] columns = new String[] { MyDatabaseHelper.COL_GL_ID, MyDatabaseHelper.COL_GL_LATITUDE, MyDatabaseHelper.COL_GL_LONGITUDE, MyDatabaseHelper.COL_GL_ALTITUDE, MyDatabaseHelper.COL_GL_RADIUS };
@@ -33,7 +33,9 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
             double geoAlt = ConversionHelper.intToGeoLocation(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_GL_ALTITUDE)));
             double geoRad = ConversionHelper.intToGeoLocation(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_GL_RADIUS)));
 
-            result.add(new GeoLocation(id, geoLat, geoLon, geoAlt, geoRad));
+            GeoLocation gl = new GeoLocation(geoLat, geoLon, geoAlt, geoRad);
+            gl.id = id;
+            result.add(gl);
         }
 
         cur.close();
@@ -41,9 +43,9 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
     }
 
     @Override
-    public void addPoints(int geoSessionId, ArrayList<GeoLocation> points) {
-        for (GeoLocation point : points){
-            ContentValues cv = new ContentValues(4);
+    public void addLocations(int geoSessionId, ArrayList<GeoLocation> locations) {
+        for (GeoLocation point : locations){
+            ContentValues cv = new ContentValues(5);
 
             int geoLat = ConversionHelper.geoLocationToInt(point.latitude);
             int geoLon = ConversionHelper.geoLocationToInt(point.longitude);
@@ -56,12 +58,18 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
             cv.put(MyDatabaseHelper.COL_GL_ALTITUDE, geoAlt);
             cv.put(MyDatabaseHelper.COL_GL_RADIUS, geoRad);
 
-            db.insert(MyDatabaseHelper.TAB_GEO_LOCATIONS, null, cv);
+            long id = db.insert(MyDatabaseHelper.TAB_GEO_LOCATIONS, null, cv);
+            point.id = (int)id;
         }
     }
 
     @Override
-    public void deleteAllPoints(int geoSessionId) {
-        db.delete(MyDatabaseHelper.TAB_GEO_LOCATIONS, null, null);
+    public void deleteAllLocations(int geoSessionId) {
+        db.delete(MyDatabaseHelper.TAB_GEO_LOCATIONS, String.format("%s=?", MyDatabaseHelper.COL_GL_GEO_SESSION_ID), new String[] { String.valueOf(geoSessionId) });
+    }
+
+    @Override
+    public void deleteLocation(GeoLocation geoLocation) {
+        db.delete(MyDatabaseHelper.TAB_GEO_LOCATIONS, String.format("%s=?", MyDatabaseHelper.COL_GL_ID), new String[] { String.valueOf(geoLocation.id) });
     }
 }

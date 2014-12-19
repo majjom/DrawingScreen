@@ -15,4 +15,6 @@ public interface IMappedPointsPersistence {
 
     public void deleteAllPoints(int mapId);
 
+    public void deleteMappedPoint(MappedPoint mappedPoint);
+
 }

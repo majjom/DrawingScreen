@@ -10,8 +10,7 @@ public class GeoLocation extends PersistedObject {
 
     public double radius;
 
-    public GeoLocation(int id, double latitude, double longitude, double altitude, double radius){
-        this.id = id;
+    public GeoLocation(double latitude, double longitude, double altitude, double radius){
         this.latitude = latitude;
         this.longitude = longitude;
         this.altitude = altitude;

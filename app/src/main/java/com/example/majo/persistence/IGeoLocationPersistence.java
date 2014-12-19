@@ -9,9 +9,11 @@ import java.util.ArrayList;
  * Created by majo on 14-Dec-14.
  */
 public interface IGeoLocationPersistence {
-    public ArrayList<GeoLocation> getAllPoints(int geoSessionId);
+    public ArrayList<GeoLocation> getAllLocations(int geoSessionId);
 
-    public void addPoints(int geoSessionId, ArrayList<GeoLocation> points);
+    public void addLocations(int geoSessionId, ArrayList<GeoLocation> locations);
 
-    public void deleteAllPoints(int geoSessionId);
+    public void deleteLocation(GeoLocation geoLocation);
+
+    public void deleteAllLocations(int geoSessionId);
 }
