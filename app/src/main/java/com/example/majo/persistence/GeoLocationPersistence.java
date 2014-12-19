@@ -23,7 +23,7 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
         ArrayList<GeoLocation> result = new ArrayList<>();
 
         String[] columns = new String[] { MyDatabaseHelper.COL_GL_ID, MyDatabaseHelper.COL_GL_LATITUDE, MyDatabaseHelper.COL_GL_LONGITUDE, MyDatabaseHelper.COL_GL_ALTITUDE, MyDatabaseHelper.COL_GL_RADIUS };
-        Cursor cur = db.query(MyDatabaseHelper.TAB_GEO_LOCATIONS, columns, String.format("%s=?", MyDatabaseHelper.COL_GL_GEO_SESSION_ID), new String[] { String.valueOf(geoSessionId) }, null, null, MyDatabaseHelper.COL_GL_ID);
+        Cursor cur = db.query(MyDatabaseHelper.TAB_GEO_LOCATIONS, columns, String.format("%s=?", MyDatabaseHelper.COL_GL_GEO_SESSION_ID), new String[] { String.valueOf(geoSessionId) }, null, null, MyDatabaseHelper.COL_GL_ORDERING);
 
 
         while(cur.moveToNext()){
@@ -44,8 +44,9 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
 
     @Override
     public void addLocations(int geoSessionId, ArrayList<GeoLocation> locations) {
+        int order = 1;
         for (GeoLocation point : locations){
-            ContentValues cv = new ContentValues(5);
+            ContentValues cv = new ContentValues(6);
 
             int geoLat = ConversionHelper.geoLocationToInt(point.latitude);
             int geoLon = ConversionHelper.geoLocationToInt(point.longitude);
@@ -58,8 +59,11 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
             cv.put(MyDatabaseHelper.COL_GL_ALTITUDE, geoAlt);
             cv.put(MyDatabaseHelper.COL_GL_RADIUS, geoRad);
 
+            cv.put(MyDatabaseHelper.COL_MP_ORDERING, order);
+
             long id = db.insert(MyDatabaseHelper.TAB_GEO_LOCATIONS, null, cv);
             point.id = (int)id;
+            order++;
         }
     }
 

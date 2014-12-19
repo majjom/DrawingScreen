@@ -11,13 +11,14 @@ import android.util.Log;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "mydb";
-    private static final int DB_VERSION = 8;
+    private static final int DB_VERSION = 9;
 
     public static final String TAB_DRAWING_POINTS = "drawing_points";
     public static final String COL_DP_ID = "id";
     public static final String COL_DP_X = "x";
     public static final String COL_DP_Y = "y";
     public static final String COL_DP_RADIUS = "radius";
+    public static final String COL_DP_ORDERING = "ordering";
     public static final String COL_DP_MAP_ID = "map_id";
 
     public static final String TAB_MAPPED_POINTS = "mapped_points";
@@ -29,6 +30,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_MP_GEO_LON = "geo_longitude";
     public static final String COL_MP_GEO_ALT = "geo_altitude";
     public static final String COL_MP_GEO_RAD = "geo_radius";
+    public static final String COL_MP_ORDERING = "ordering";
     public static final String COL_MP_MAP_ID = "map_id";
 
     public static final String TAB_GEO_LOCATIONS = "geo_locations";
@@ -37,6 +39,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_GL_LONGITUDE = "longitude";
     public static final String COL_GL_ALTITUDE = "altitude";
     public static final String COL_GL_RADIUS = "radius";
+    public static final String COL_GL_ORDERING = "ordering";
     public static final String COL_GL_GEO_SESSION_ID = "geo_session_id";
 
     public static final String TAB_GEO_SESSIONS = "geo_sessions";
@@ -74,25 +77,25 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createStmt);
 
         // table Drawing points
-        createStmt = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, FOREIGN KEY(%s) REFERENCES %s(%s));)"
+        createStmt = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, FOREIGN KEY(%s) REFERENCES %s(%s));)"
                 , /*PK, FK*/TAB_DRAWING_POINTS, COL_DP_ID, COL_DP_MAP_ID,
-                /*data*/ COL_DP_X, COL_DP_Y, COL_DP_RADIUS
+                /*data*/ COL_DP_X, COL_DP_Y, COL_DP_RADIUS, COL_DP_ORDERING
                 ,/*FK ref*/ COL_DP_MAP_ID, TAB_MAPS, COL_MA_ID);
         Log.d(tag, createStmt);
         db.execSQL(createStmt);
         // table Mapped points
-        createStmt = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, FOREIGN KEY(%s) REFERENCES %s(%s));)"
+        createStmt = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, FOREIGN KEY(%s) REFERENCES %s(%s));)"
                 , /*PK, FK*/ TAB_MAPPED_POINTS, COL_MP_ID, COL_MP_MAP_ID,
-                /*data*/ COL_MP_DRAWING_X, COL_MP_DRAWING_Y, COL_MP_DRAWING_RADIUS, COL_MP_GEO_LAT, COL_MP_GEO_LON, COL_MP_GEO_ALT, COL_MP_GEO_RAD
+                /*data*/ COL_MP_DRAWING_X, COL_MP_DRAWING_Y, COL_MP_DRAWING_RADIUS, COL_MP_GEO_LAT, COL_MP_GEO_LON, COL_MP_GEO_ALT, COL_MP_GEO_RAD, COL_MP_ORDERING
                 ,/*FK ref*/ COL_MP_MAP_ID, TAB_MAPS, COL_MA_ID);
         Log.d(tag, createStmt);
         db.execSQL(createStmt);
 
         // ********* LVL 03 **************
         // table Geo locations
-        createStmt = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, FOREIGN KEY(%s) REFERENCES %s(%s));)"
+        createStmt = String.format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, %s INTEGER, FOREIGN KEY(%s) REFERENCES %s(%s));)"
                 , /*PK, FK*/TAB_GEO_LOCATIONS, COL_GL_ID, COL_GL_GEO_SESSION_ID,
-                /*data*/ COL_GL_LATITUDE, COL_GL_LONGITUDE, COL_GL_ALTITUDE, COL_GL_RADIUS
+                /*data*/ COL_GL_LATITUDE, COL_GL_LONGITUDE, COL_GL_ALTITUDE, COL_GL_RADIUS, COL_GL_ORDERING
                 /*FK ref*/, COL_GL_GEO_SESSION_ID, TAB_GEO_SESSIONS, COL_GS_ID);
         Log.d(tag, createStmt);
         db.execSQL(createStmt);
