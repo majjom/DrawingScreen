@@ -16,21 +16,28 @@ import com.example.majo.persistence.DrawingPointPersistence;
 import java.util.ArrayList;
 
 
-public class MainActivity extends Activity {
+public class DrawingPointsActivity extends Activity {
 
     private DrawingScreenView imageView;
+
     private DrawingPointPersistence persistence;
 
     // todo put this away
     private int index;
 
+    private int schemaMapId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // todo take this from context
+        this.schemaMapId = 1;
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_drawing_points);
 
         imageView = (DrawingScreenView)findViewById(R.id.imageView);
         imageView.setImageAsset("melchsee.jpg");
@@ -118,7 +125,7 @@ public class MainActivity extends Activity {
             btn.setBackgroundResource(R.drawable.path_invisible);
             this.imageView.toggleAllPointsVisible();
         } else {
-            this.imageView.loadAllPoints(this.persistence);
+            this.imageView.loadAllPoints(this.persistence, this.schemaMapId);
             btn.setBackgroundResource(R.drawable.path_visible);
             //this.imageView.toggleAllPointsVisible();
         }
@@ -133,11 +140,11 @@ public class MainActivity extends Activity {
     }
 
     public void onSubmitDrawingClick(View view) {
-        this.imageView.submitDrawing(this.persistence);
+        this.imageView.submitDrawing(this.persistence, this.schemaMapId);
     }
 
     public void onDrawPositionClick(View view) {
-        ArrayList<DrawingPoint> points =  this.persistence.getAllPoints(0);
+        ArrayList<DrawingPoint> points =  this.persistence.getAllPoints(this.schemaMapId);
         if (points.size() == 0) {
             this.imageView.setPositionVisibility(false);
             return;
@@ -156,13 +163,18 @@ public class MainActivity extends Activity {
     }
 
     public void onDeleteAllStoredPointsClick(View view) {
-        this.persistence.deleteAllPoints(0);
+        this.persistence.deleteAllPoints(this.schemaMapId);
         this.imageView.clearAllPoints();
         onDrawPositionClick(view);
     }
 
     public void onDrawPointsListClick(View view) {
         Intent intent = new Intent(this, DrawingPointsListActivity.class);
+        startActivity(intent);
+    }
+
+    public void onGeoLocationsMapClick(View view) {
+        Intent intent = new Intent(this, GeoLocationsMapsActivity.class);
         startActivity(intent);
     }
 }

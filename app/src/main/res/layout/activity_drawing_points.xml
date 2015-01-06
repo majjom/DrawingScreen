@@ -78,7 +78,14 @@
         android:layout_toRightOf="@id/deleteAllStoredPoints"
         />
 
-
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/geoLocationsMap"
+        android:background="@drawable/draw_position"
+        android:onClick="onGeoLocationsMapClick"
+        android:layout_toRightOf="@id/drawPosition"
+        />
 
 
 

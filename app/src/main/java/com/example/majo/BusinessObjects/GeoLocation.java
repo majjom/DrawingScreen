@@ -16,4 +16,9 @@ public class GeoLocation extends PersistedObject {
         this.altitude = altitude;
         this.radius = radius;
     }
+
+    @Override
+    public String toString() {
+        return String.format("lat:%s lon:%s alt:%s rad:%s", latitude, longitude, altitude, radius);
+    }
 }

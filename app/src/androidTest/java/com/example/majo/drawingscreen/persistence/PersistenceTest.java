@@ -8,7 +8,7 @@ import com.example.majo.BusinessObjects.GeoLocation;
 import com.example.majo.BusinessObjects.GeoSession;
 import com.example.majo.BusinessObjects.MappedPoint;
 import com.example.majo.BusinessObjects.SchemaMap;
-import com.example.majo.drawingscreen.MainActivity;
+import com.example.majo.drawingscreen.DrawingPointsActivity;
 import com.example.majo.persistence.DrawingPointPersistence;
 import com.example.majo.persistence.GeoLocationPersistence;
 import com.example.majo.persistence.GeoSessionPersistence;
@@ -25,12 +25,12 @@ import java.util.ArrayList;
 /**
  * Created by majo on 14-Dec-14.
  */
-public class PersistenceTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPointsActivity> {
 
-    MainActivity activity;
+    DrawingPointsActivity activity;
 
     public PersistenceTest() {
-        super(MainActivity.class);
+        super(DrawingPointsActivity.class);
     }
 
     @Override

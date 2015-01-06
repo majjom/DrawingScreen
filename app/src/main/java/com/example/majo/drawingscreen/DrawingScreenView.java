@@ -253,11 +253,11 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
 
-    public void submitDrawing(IDrawingPointPersistence persistence){
+    public void submitDrawing(IDrawingPointPersistence persistence, int schemaMapId){
         initiateAllPointsBitmapLayer();
         initiateDrawingPointsBitmapLayer();
         this.allPointsBitmap.addPoints(this.drawingPointsBitmap.getPoints());
-        persistence.addPoints(0, this.drawingPointsBitmap.getPoints());
+        persistence.addPoints(schemaMapId, this.drawingPointsBitmap.getPoints());
         this.drawingPointsBitmap.removeAllPoints();
         setAllPointsVisible(true);
         invalidate();
@@ -280,9 +280,9 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         invalidate();
     }
 
-    public void loadAllPoints(IDrawingPointPersistence persistence){
+    public void loadAllPoints(IDrawingPointPersistence persistence, int schemaMapId){
         setShowAllPoints(true);
-        this.allPointsBitmap.addPoints(persistence.getAllPoints(0));
+        this.allPointsBitmap.addPoints(persistence.getAllPoints(schemaMapId));
     }
 
     public void toggleShowAllPoints(){

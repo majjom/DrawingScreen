@@ -6,7 +6,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.MappedPoint;
-import com.example.majo.drawingscreen.MainActivity;
+import com.example.majo.drawingscreen.DrawingPointsActivity;
 import com.example.majo.persistence.IMappedPointsPersistence;
 import com.example.majo.persistence.MappedPointsPersistence;
 import com.example.majo.position.IPositionService;
@@ -17,12 +17,12 @@ import java.util.ArrayList;
 /**
  * Created by majo on 14-Dec-14.
  */
-public class PositionTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class PositionTest extends ActivityInstrumentationTestCase2<DrawingPointsActivity> {
 
-    MainActivity activity;
+    DrawingPointsActivity activity;
 
     public PositionTest() {
-        super(MainActivity.class);
+        super(DrawingPointsActivity.class);
     }
 
     @Override
