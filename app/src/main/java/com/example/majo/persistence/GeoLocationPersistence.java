@@ -43,27 +43,37 @@ public class GeoLocationPersistence extends DatabaseConnection implements IGeoLo
     }
 
     @Override
+    public int getLastLocationOrder(int geoSessionId) {
+        // todo finish this
+        return 0;
+    }
+
+
+    @Override
+    public void addLocation(int geoSessionId, GeoLocation location) {
+        ContentValues cv = new ContentValues(6);
+
+        int geoLat = ConversionHelper.geoLocationToInt(location.latitude);
+        int geoLon = ConversionHelper.geoLocationToInt(location.longitude);
+        int geoAlt = ConversionHelper.geoLocationToInt(location.altitude);
+        int geoRad = ConversionHelper.geoLocationToInt(location.radius);
+
+        cv.put(MyDatabaseHelper.COL_GL_GEO_SESSION_ID, geoSessionId);
+        cv.put(MyDatabaseHelper.COL_GL_LATITUDE, geoLat);
+        cv.put(MyDatabaseHelper.COL_GL_LONGITUDE, geoLon);
+        cv.put(MyDatabaseHelper.COL_GL_ALTITUDE, geoAlt);
+        cv.put(MyDatabaseHelper.COL_GL_RADIUS, geoRad);
+
+        cv.put(MyDatabaseHelper.COL_MP_ORDERING, getLastLocationOrder(geoSessionId) + 1);
+
+        long id = db.insert(MyDatabaseHelper.TAB_GEO_LOCATIONS, null, cv);
+        location.id = (int)id;
+    }
+
+    @Override
     public void addLocations(int geoSessionId, ArrayList<GeoLocation> locations) {
-        int order = 1;
-        for (GeoLocation point : locations){
-            ContentValues cv = new ContentValues(6);
-
-            int geoLat = ConversionHelper.geoLocationToInt(point.latitude);
-            int geoLon = ConversionHelper.geoLocationToInt(point.longitude);
-            int geoAlt = ConversionHelper.geoLocationToInt(point.altitude);
-            int geoRad = ConversionHelper.geoLocationToInt(point.radius);
-
-            cv.put(MyDatabaseHelper.COL_GL_GEO_SESSION_ID, geoSessionId);
-            cv.put(MyDatabaseHelper.COL_GL_LATITUDE, geoLat);
-            cv.put(MyDatabaseHelper.COL_GL_LONGITUDE, geoLon);
-            cv.put(MyDatabaseHelper.COL_GL_ALTITUDE, geoAlt);
-            cv.put(MyDatabaseHelper.COL_GL_RADIUS, geoRad);
-
-            cv.put(MyDatabaseHelper.COL_MP_ORDERING, order);
-
-            long id = db.insert(MyDatabaseHelper.TAB_GEO_LOCATIONS, null, cv);
-            point.id = (int)id;
-            order++;
+        for (GeoLocation location : locations){
+            addLocation(geoSessionId, location);
         }
     }
 

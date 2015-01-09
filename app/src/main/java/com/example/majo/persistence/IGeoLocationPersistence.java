@@ -11,6 +11,10 @@ import java.util.ArrayList;
 public interface IGeoLocationPersistence {
     public ArrayList<GeoLocation> getAllLocations(int geoSessionId);
 
+    public int getLastLocationOrder(int geoSessionId);
+
+    public void addLocation(int geoSessionId, GeoLocation location);
+
     public void addLocations(int geoSessionId, ArrayList<GeoLocation> locations);
 
     public void deleteLocation(GeoLocation geoLocation);

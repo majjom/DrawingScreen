@@ -22,25 +22,6 @@
         android:layout_below="@+id/textView"
         />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/appendPoints"
-        android:background="@drawable/submit_drawing"
-        android:onClick="onAppendPointsClick"
-        android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/clearMap"
-        />
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/clearAllPoints"
-        android:background="@drawable/delete_saved_data"
-        android:onClick="onClearAllPointsClick"
-        android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/appendPoints"
-        />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -49,7 +30,7 @@
         android:background="@drawable/draw_points_list"
         android:onClick="onGeoLocationsListClick"
         android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/clearAllPoints"
+        android:layout_toRightOf="@+id/clearMap"
         />
 
 
@@ -65,7 +46,15 @@
         android:layout_toRightOf="@+id/geoLocationsList"
         />
 
-
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/centerPolyline"
+        android:background="@drawable/delete_saved_data"
+        android:onClick="onCenterPolylineClick"
+        android:layout_below="@+id/textView"
+        android:layout_toRightOf="@+id/zoomLevel"
+        />
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"

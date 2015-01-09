@@ -16,9 +16,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.majo.BusinessObjects.GeoLocation;
+import com.example.majo.GoogleMap.IPolyLineDrawer;
+import com.example.majo.GoogleMap.LocationConverter;
+import com.example.majo.GoogleMap.PolyLineDrawer;
 import com.example.majo.persistence.GeoLocationPersistence;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -26,15 +30,12 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
-
     private GeoLocationPersistence persistence;
 
     private LocationManager mManager;
-    private Location mCurrentLocation;
 
-    private TextView mLocationView;
-
-    GoogleMapsWrapper googleMapsWrapper;
+    // GoogleMapsWrapper googleMapsWrapper;
+    IPolyLineDrawer googleMapsWrapper;
 
     TextView text;
 
@@ -51,12 +52,12 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
         SupportMapFragment mMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
-        googleMapsWrapper = new GoogleMapsWrapper(mMapFragment.getMap());
+        googleMapsWrapper = new PolyLineDrawer(mMapFragment.getMap());
 
         this.text = (TextView)findViewById(R.id.textView);
 
         // load from db
-        this.drawGeoLocationsFromDb();
+        this.addGeoLocationsFromDb();
 
     }
 
@@ -64,7 +65,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
 
-        // try to enable Location manager
+        // try to enable Location manager (if not than quit activity)
         if (!mManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 
             // ask user to enable this
@@ -89,13 +90,8 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
             builder.create().show();
         }
 
-
         // get cached location, if it exists
-        mCurrentLocation = mManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        this.googleMapsWrapper.addTravelPoint(mCurrentLocation);
-        if (mCurrentLocation != null){
-            this.text.setText(mCurrentLocation.toString());
-        }
+        addLocation(mManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
 
         // register for regular updates
         int minTime = 0;
@@ -123,11 +119,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     private LocationListener mListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            mCurrentLocation = location;
-            googleMapsWrapper.addTravelPoint(mCurrentLocation);
-            if (mCurrentLocation != null){
-                text.setText(mCurrentLocation.toString());
-            }
+            addLocation(location);
         }
 
         @Override
@@ -146,27 +138,27 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         }
     };
 
-    public void drawGeoLocationsFromDb(){
+
+
+
+    private void addLocation(Location location){
+        if (location != null){
+            googleMapsWrapper.add(LocationConverter.LocationToLatLng(location));
+            persistence.addLocation(this.geoSessionId, LocationConverter.LocationToGeoLocation(location));
+            text.setText(location.toString());
+        }
+    }
+
+    public void addGeoLocationsFromDb(){
         persistence = new GeoLocationPersistence(this);
         ArrayList<GeoLocation> locationsFromDb = persistence.getAllLocations(this.geoSessionId);
-        googleMapsWrapper.drawStoredGeoLocations(locationsFromDb);
+        googleMapsWrapper.add(LocationConverter.GeoLocationToLatLng(locationsFromDb));
     }
 
 
     public void onClearMapClick(View view) {
-        this.googleMapsWrapper.clearAllTravelPoints();
-    }
-
-    public void onClearAllPointsClick(View view) {
-        this.googleMapsWrapper.clearAllTravelPoints();
-        this.persistence.deleteAllLocations(this.geoSessionId);
-    }
-
-    public void onAppendPointsClick(View view) {
-        ArrayList<GeoLocation> cache = this.googleMapsWrapper.getCachedGeoLocations();
-        this.persistence.addLocations(this.geoSessionId, cache);
-        this.googleMapsWrapper.clearAllTravelPoints();
-        this.drawGeoLocationsFromDb();
+        this.googleMapsWrapper.clear();
+        persistence.deleteAllLocations(this.geoSessionId);
     }
 
     public void onGeoLocationsListClick(View view) {
@@ -179,7 +171,11 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         int zoomLevel = Integer.parseInt(zoomLevelButton.getText().toString());
         zoomLevel++;
         if (zoomLevel > 20) zoomLevel = 5;
-        this.googleMapsWrapper.reZoomMap(zoomLevel);
+        this.googleMapsWrapper.setZoom(zoomLevel);
         zoomLevelButton.setText(Integer.toString(zoomLevel));
+    }
+
+    public void onCenterPolylineClick(View view) {
+        this.googleMapsWrapper.centerMapVisiblePath();
     }
 }
