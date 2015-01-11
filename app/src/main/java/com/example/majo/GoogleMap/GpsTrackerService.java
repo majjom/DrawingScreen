@@ -72,6 +72,7 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
         if (this.databaseConnection!=null){
             this.databaseConnection.onDestroy();
         }
+
         Log.i(LOGTAG, "Tracking Service Stopped...");
         super.onDestroy();
     }
@@ -86,9 +87,14 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             return;
         }
+
+        // change geoSession
+        Log.i(LOGTAG, String.format("Started tracking geoSessionId %d", geoSessionId));
         this.geoSessionId = geoSessionId;
+
+        // attache to GPS callback
         if (isTracking) return;
-        Log.i(LOGTAG, String.format("Started tracking (%d, %s)", minTime, minDistance));
+        Log.i(LOGTAG, String.format("Started tracking GPS attached (%d, %s)", minTime, minDistance));
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, this);
         isTracking = true;
     }
@@ -101,6 +107,13 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
 
     public boolean isTracking() {
         return isTracking;
+    }
+
+    public int getTrackedGeoSessionId(){
+        if (this.isTracking){
+            return this.geoSessionId;
+        }
+        return -1;
     }
 
     public int getLocationsCount() {
@@ -122,7 +135,7 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
 
     /* Service Access Methods Binder */
     public class TrackerBinder extends Binder {
-        public GpsTrackerService getService() {
+        public IGpsTrackerService getService() {
             return GpsTrackerService.this;
         }
     }
@@ -150,6 +163,7 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
         storedLocations.add(location);
         this.persistence.addLocation(this.geoSessionId, LocationConverter.LocationToGeoLocation(location));
 
+        // broadcast new location to whoever is listening
         Intent intent = new Intent(BROADCAST_ON_LOCATION_CHANGED);
         intent.putExtra(BROADCAST_EXTRA_LOCATION, location);
         sendBroadcast(intent);

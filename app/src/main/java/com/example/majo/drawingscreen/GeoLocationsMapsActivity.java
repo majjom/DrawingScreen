@@ -1,6 +1,5 @@
 package com.example.majo.drawingscreen;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -23,6 +21,7 @@ import android.widget.TextView;
 
 import com.example.majo.BusinessObjects.GeoLocation;
 import com.example.majo.GoogleMap.GpsTrackerService;
+import com.example.majo.GoogleMap.IGpsTrackerService;
 import com.example.majo.GoogleMap.IPolyLineDrawer;
 import com.example.majo.GoogleMap.LocationConverter;
 import com.example.majo.GoogleMap.PolyLineDrawer;
@@ -30,11 +29,9 @@ import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
 import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IGeoLocationPersistence;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import java.util.ArrayList;
-import java.util.logging.Handler;
 
 public class GeoLocationsMapsActivity extends FragmentActivity {
 
@@ -42,9 +39,9 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
 
     IPolyLineDrawer googleMapsWrapper;
 
-    GpsTrackerService trackerService;
+    IGpsTrackerService trackerService;
 
-    TextView text;
+    TextView locationCountText;
     ImageButton trackerServiceStatusButton;
 
     private int geoSessionId;
@@ -71,12 +68,11 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         SupportMapFragment mMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         googleMapsWrapper = new PolyLineDrawer(mMapFragment.getMap());
 
-        this.text = (TextView)findViewById(R.id.textView);
+        this.locationCountText = (TextView)findViewById(R.id.textView);
         this.trackerServiceStatusButton = (ImageButton)findViewById(R.id.trackingStatus);
 
         // load from persistence
         this.loadGeoLocationsFromDb();
-
     }
 
     @Override
@@ -108,8 +104,8 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
             builder.create().show();
         }
 
-        // get cached location, if it exists
-        addLocation(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+        // get cached location, if it exists and center map accordingly (don't save this point as data)
+        this.googleMapsWrapper.putMarkerAndCenter(LocationConverter.LocationToLatLng(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)));
 
         // run the GpsTrackerService (if service is already running, than nothing will be done inside the service although the intent will be sent)
         startService(serviceIntent);
@@ -123,6 +119,13 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
 
     @Override
     protected void onPause() {
+        // if the service is not tracking than it makes no sense for it to run in background
+        // if we leave the activity -> stop service. If we than unbound it than service will die.
+        // If service is tracking than don't kill it, just unbound. Service will survive.
+        if(!trackerService.isTracking()) {
+            // Stopping the service lets it die once unbound
+            stopService(serviceIntent);
+        }
         unregisterReceiver(receiver);
 
         super.onPause();
@@ -138,12 +141,9 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     }
 
     private void addLocation(Location location){
-        if (location != null){
+        if (location != null) {
             googleMapsWrapper.add(LocationConverter.LocationToLatLng(location));
-            if (trackerService != null) {
-                // TODO UI thread is out of sync!!!
-                // ((TextView)findViewById(R.id.textView)).setText(trackerService.getLocationsCount());
-            }
+            this.locationCountText.setText(String.valueOf(googleMapsWrapper.getPoints().size()));
         }
     }
 
@@ -158,12 +158,17 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
 
     private void updateTrackerServiceStatusButton(){
         if (trackerService == null) return;
+
         if (trackerService.isTracking()){
             trackerServiceStatusButton.setBackgroundResource(R.drawable.ic_pause);
         } else {
             trackerServiceStatusButton.setBackgroundResource(R.drawable.ic_play);
         }
     }
+
+
+
+
 
 
     /*Broadcast receiver*/
@@ -178,7 +183,12 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
 
 
 
-    /* Communication with service */
+
+
+
+
+
+    /* Communication with service - the async binding */
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -236,13 +246,5 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
             trackerService.startTracking(this.geoSessionId, 0, 10);
         }
         updateTrackerServiceStatusButton();
-    }
-
-    public void onKillServiceClick(View view) {
-        //Unbind from the service
-        //unbindService(serviceConnection);
-
-        // stop service
-        stopService(serviceIntent);
     }
 }

@@ -21,6 +21,8 @@ public interface IPolyLineDrawer {
     void setZoom(int zoomLevel);
     int getZoom();
 
+    void putMarkerAndCenter(LatLng point);
+
     void reCenterMap();
     void centerMapVisiblePath();
 }

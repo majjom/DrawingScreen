@@ -12,7 +12,10 @@ import java.util.List;
 public interface IGpsTrackerService {
     void startTracking(int geoSessionId, long minTime, float minDistance);
     void stopTracking();
+
     boolean isTracking();
+    int getTrackedGeoSessionId();
+
     int getLocationsCount();
     List<Location> getLocations();
 }

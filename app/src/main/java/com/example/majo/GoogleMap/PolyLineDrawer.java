@@ -53,8 +53,8 @@ public class PolyLineDrawer implements IPolyLineDrawer {
         List<LatLng> tmpList = new ArrayList<>();
         tmpList.add(point);
         this.addPoints(tmpList);
-        this.setMarker(point);
-        centerMap(point, this.lastZoomLevel);
+
+        putMarkerAndCenter(point);
     }
 
     @Override
@@ -104,6 +104,13 @@ public class PolyLineDrawer implements IPolyLineDrawer {
     @Override
     public void reCenterMap() {
         centerMap(this.lastCenteredPoint, this.lastZoomLevel);
+    }
+
+    @Override
+    public void putMarkerAndCenter(LatLng point) {
+        if (point == null) return;
+        this.setMarker(point);
+        centerMap(point, this.lastZoomLevel);
     }
 
     @Override
