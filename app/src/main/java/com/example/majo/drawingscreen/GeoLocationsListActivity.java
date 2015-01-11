@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.majo.BusinessObjects.GeoLocation;
-import com.example.majo.GoogleMap.LocationConverter;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
 import com.example.majo.persistence.IDatabaseConnection;
@@ -38,7 +37,7 @@ public class GeoLocationsListActivity extends ActionBarActivity {
         IDatabaseConnection db = new DatabaseConnection(this);
         IGeoLocationPersistence persistence = new GeoLocationPersistence(new DatabaseConnection(this));
         ArrayList<GeoLocation> locations = persistence.getAllLocations(this.geoSessionId);
-        db.onDestroy();
+        db.destroy();
 
         ArrayAdapter<GeoLocation> aa = new ArrayAdapter<GeoLocation>(this, android.R.layout.simple_list_item_1, locations);
         geoLocations.setAdapter(aa);

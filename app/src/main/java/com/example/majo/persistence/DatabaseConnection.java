@@ -17,7 +17,7 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
 
     @Override
-    public void onDestroy() {
+    public void destroy() {
         if (this.db != null){
             this.db.close();
         }

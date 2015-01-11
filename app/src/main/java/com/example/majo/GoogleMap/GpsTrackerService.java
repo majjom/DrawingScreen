@@ -9,7 +9,6 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
@@ -26,16 +25,29 @@ import java.util.List;
 public class GpsTrackerService extends Service implements LocationListener, IGpsTrackerService {
     private static final String LOGTAG = "GpsTrackerService";
 
+
+    /*reference to self for a singleton thingie*/
+    public static GpsTrackerService staticInstance;
+
+
+
+
     private LocationManager locationManager;
     private List<Location> storedLocations;
     private boolean isTracking = false;
 
     public static final String BROADCAST_ON_LOCATION_CHANGED = "com.example.majo.GoogleMap.ON_LOCATION_CHANGED";
     public static final String BROADCAST_EXTRA_LOCATION = "EXTRA_LOCATION";
+    public static final String BROADCAST_EXTRA_GEO_SESSION_ID = "BROADCAST_EXTRA_GEO_SESSION_ID";
 
     private IDatabaseConnection databaseConnection;
     private IGeoLocationPersistence persistence;
     private int geoSessionId;
+
+
+    public static GpsTrackerService getStaticInstance(){
+        return staticInstance;
+    }
 
     public GpsTrackerService() {
     }
@@ -48,6 +60,8 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
     @Override
     public void onCreate() {
         super.onCreate();
+
+        staticInstance = this;
 
         storedLocations = new ArrayList<Location>();
 
@@ -65,12 +79,14 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
 
     @Override
     public void onDestroy() {
+        staticInstance = null;
+
         // remove listening to updates
         locationManager.removeUpdates(this);
 
         // close database
         if (this.databaseConnection!=null){
-            this.databaseConnection.onDestroy();
+            this.databaseConnection.destroy();
         }
 
         Log.i(LOGTAG, "Tracking Service Stopped...");
@@ -92,7 +108,7 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
         Log.i(LOGTAG, String.format("Started tracking geoSessionId %d", geoSessionId));
         this.geoSessionId = geoSessionId;
 
-        // attache to GPS callback
+        // attach to GPS callback
         if (isTracking) return;
         Log.i(LOGTAG, String.format("Started tracking GPS attached (%d, %s)", minTime, minDistance));
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, this);
@@ -166,6 +182,7 @@ public class GpsTrackerService extends Service implements LocationListener, IGps
         // broadcast new location to whoever is listening
         Intent intent = new Intent(BROADCAST_ON_LOCATION_CHANGED);
         intent.putExtra(BROADCAST_EXTRA_LOCATION, location);
+        intent.putExtra(BROADCAST_EXTRA_GEO_SESSION_ID, geoSessionId);
         sendBroadcast(intent);
     }
     @Override

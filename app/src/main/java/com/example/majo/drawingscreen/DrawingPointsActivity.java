@@ -64,8 +64,8 @@ public class DrawingPointsActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_draw_points) {
-            //IDrawingPointPersistence persistence = new RandomDrawingPointPersistence();
-            //imageView.addLocations(persistence.getAllLocations());
+            //IDrawingPointPersistence geoLocationPersistence = new RandomDrawingPointPersistence();
+            //imageView.addLocations(geoLocationPersistence.getAllLocations());
             //imageView.setPointLayerVisible(true);
 
             return true;
@@ -97,7 +97,7 @@ public class DrawingPointsActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         if (this.persistence!=null){
-            this.persistence.onDestroy();
+            this.persistence.destroy();
         }
     }
 
@@ -175,6 +175,12 @@ public class DrawingPointsActivity extends Activity {
 
     public void onGeoLocationsMapClick(View view) {
         Intent intent = new Intent(this, GeoLocationsMapsActivity.class);
+
+        startActivity(intent);
+    }
+
+    public void onGeoSessionsGotoClick(View view) {
+        Intent intent = new Intent(this, GeoSessionsListActivity.class);
 
         startActivity(intent);
     }

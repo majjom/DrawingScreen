@@ -12,6 +12,8 @@ import java.util.ArrayList;
 public interface IGeoSessionPersistence {
     public ArrayList<GeoSession> getAllGeoSessions(int mapId);
 
+    public void addSession(int mapId, GeoSession session);
+
     public void addSessions(int mapId, ArrayList<GeoSession> sessions);
 
     public void deleteAllSessions(int mapId);

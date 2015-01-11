@@ -1,14 +1,16 @@
 package com.example.majo.BusinessObjects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by moravekm on 17-Dec-14.
  */
-public class GeoSession extends PersistedObject {
+public class GeoSession extends PersistedObject implements Serializable {
     public String name;
     public Date dateCreated;
+    public boolean isBeingTracked = false;
     protected ArrayList<GeoLocation> geoLocations;
 
     public GeoSession(String name){

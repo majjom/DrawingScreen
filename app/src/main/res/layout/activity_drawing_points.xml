@@ -87,6 +87,15 @@
         android:layout_toRightOf="@id/drawPosition"
         />
 
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/geoSessionsGoto"
+        android:background="@drawable/draw_points_list"
+        android:onClick="onGeoSessionsGotoClick"
+        android:layout_toRightOf="@id/geoLocationsMap"
+        />
+
 
 
 

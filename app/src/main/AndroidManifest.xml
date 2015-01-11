@@ -53,6 +53,10 @@
             android:name=".GeoLocationsListActivity"
             android:label="@string/title_activity_geo_locations_list" >
         </activity>
+        <activity
+            android:name=".GeoSessionsListActivity"
+            android:label="@string/title_activity_geo_sessions_list" >
+        </activity>
     </application>
 
 </manifest>
