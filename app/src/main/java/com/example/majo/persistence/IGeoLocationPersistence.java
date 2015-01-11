@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * Created by majo on 14-Dec-14.
  */
 public interface IGeoLocationPersistence {
+    // todo array list to list
     public ArrayList<GeoLocation> getAllLocations(int geoSessionId);
 
     public int getLastLocationOrder(int geoSessionId);

@@ -32,6 +32,12 @@
             android:label="@string/title_activity_drawing_points_list" >
         </activity>
 
+        <service
+            android:name="com.example.majo.GoogleMap.GpsTrackerService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

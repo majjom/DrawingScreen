@@ -22,4 +22,9 @@ public class DatabaseConnection implements IDatabaseConnection {
             this.db.close();
         }
     }
+
+    @Override
+    public SQLiteDatabase getDb(){
+        return this.db;
+    }
 }

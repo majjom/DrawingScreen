@@ -1,63 +1,81 @@
 package com.example.majo.drawingscreen;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.majo.BusinessObjects.GeoLocation;
+import com.example.majo.GoogleMap.GpsTrackerService;
 import com.example.majo.GoogleMap.IPolyLineDrawer;
 import com.example.majo.GoogleMap.LocationConverter;
 import com.example.majo.GoogleMap.PolyLineDrawer;
+import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
+import com.example.majo.persistence.IDatabaseConnection;
+import com.example.majo.persistence.IGeoLocationPersistence;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.logging.Handler;
 
 public class GeoLocationsMapsActivity extends FragmentActivity {
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private LocationManager locationManager;
 
-    private GeoLocationPersistence persistence;
-
-    private LocationManager mManager;
-
-    // GoogleMapsWrapper googleMapsWrapper;
     IPolyLineDrawer googleMapsWrapper;
 
+    GpsTrackerService trackerService;
+
     TextView text;
+    ImageButton trackerServiceStatusButton;
 
     private int geoSessionId;
+
+
+    private IntentFilter filter = new IntentFilter(GpsTrackerService.BROADCAST_ON_LOCATION_CHANGED);
+    private GpsLocationChangedBroadcastReceiver receiver = new GpsLocationChangedBroadcastReceiver();
+    private Intent serviceIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_geo_locations_maps);
 
+        this.serviceIntent = new Intent(this, GpsTrackerService.class);
+
         // todo get from context
         this.geoSessionId = 1;
 
-        mManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        // location manager just for initiation and getting cached position
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
+        // google map + wrapper
         SupportMapFragment mMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         googleMapsWrapper = new PolyLineDrawer(mMapFragment.getMap());
 
         this.text = (TextView)findViewById(R.id.textView);
+        this.trackerServiceStatusButton = (ImageButton)findViewById(R.id.trackingStatus);
 
-        // load from db
-        this.addGeoLocationsFromDb();
+        // load from persistence
+        this.loadGeoLocationsFromDb();
 
     }
 
@@ -66,7 +84,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         super.onResume();
 
         // try to enable Location manager (if not than quit activity)
-        if (!mManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
 
             // ask user to enable this
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -91,74 +109,105 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         }
 
         // get cached location, if it exists
-        addLocation(mManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+        addLocation(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
 
-        // register for regular updates
-        int minTime = 0;
-        float minDistance = 10;
-        mManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, mListener);
+        // run the GpsTrackerService (if service is already running, than nothing will be done inside the service although the intent will be sent)
+        startService(serviceIntent);
+
+        //Bind to the service so the activity can call methods of the service [Activity -> Service]
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+
+        // register the receiver so the service can send messages back to activity [Service -> Activity]
+        registerReceiver(receiver, filter);
     }
 
     @Override
     protected void onPause() {
+        unregisterReceiver(receiver);
+
         super.onPause();
-        mManager.removeUpdates(mListener);
     }
 
 
     @Override
     protected void onDestroy() {
+        //Unbind from the service
+        unbindService(serviceConnection);
+
         super.onDestroy();
-        if (this.persistence!=null){
-            this.persistence.onDestroy();
+    }
+
+    private void addLocation(Location location){
+        if (location != null){
+            googleMapsWrapper.add(LocationConverter.LocationToLatLng(location));
+            if (trackerService != null) {
+                // TODO UI thread is out of sync!!!
+                // ((TextView)findViewById(R.id.textView)).setText(trackerService.getLocationsCount());
+            }
+        }
+    }
+
+    public void loadGeoLocationsFromDb(){
+        // open DB, get data, close DB
+        IDatabaseConnection db = new DatabaseConnection(this);
+        IGeoLocationPersistence persistence = new GeoLocationPersistence(new DatabaseConnection(this));
+        ArrayList<GeoLocation> locationsFromDb = persistence.getAllLocations(this.geoSessionId);
+        googleMapsWrapper.add(LocationConverter.GeoLocationToLatLng(locationsFromDb));
+        db.onDestroy();
+    }
+
+    private void updateTrackerServiceStatusButton(){
+        if (trackerService == null) return;
+        if (trackerService.isTracking()){
+            trackerServiceStatusButton.setBackgroundResource(R.drawable.ic_pause);
+        } else {
+            trackerServiceStatusButton.setBackgroundResource(R.drawable.ic_play);
+        }
+    }
+
+
+    /*Broadcast receiver*/
+    public class GpsLocationChangedBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Location location = intent.getParcelableExtra(GpsTrackerService.BROADCAST_EXTRA_LOCATION);
+            addLocation(location);
         }
     }
 
 
 
-    private LocationListener mListener = new LocationListener() {
+
+    /* Communication with service */
+    private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
-        public void onLocationChanged(Location location) {
-            addLocation(location);
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            trackerService = ((GpsTrackerService.TrackerBinder)service).getService();
+            updateTrackerServiceStatusButton();
         }
 
         @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
+        public void onServiceDisconnected(ComponentName name) {
+            trackerService = null;
         }
     };
 
 
 
 
-    private void addLocation(Location location){
-        if (location != null){
-            googleMapsWrapper.add(LocationConverter.LocationToLatLng(location));
-            persistence.addLocation(this.geoSessionId, LocationConverter.LocationToGeoLocation(location));
-            text.setText(location.toString());
-        }
-    }
-
-    public void addGeoLocationsFromDb(){
-        persistence = new GeoLocationPersistence(this);
-        ArrayList<GeoLocation> locationsFromDb = persistence.getAllLocations(this.geoSessionId);
-        googleMapsWrapper.add(LocationConverter.GeoLocationToLatLng(locationsFromDb));
-    }
 
 
+    /* Buttons click */
     public void onClearMapClick(View view) {
         this.googleMapsWrapper.clear();
+
+        // open DB, delete, close DB
+        IDatabaseConnection db = new DatabaseConnection(this);
+        IGeoLocationPersistence persistence = new GeoLocationPersistence(new DatabaseConnection(this));
         persistence.deleteAllLocations(this.geoSessionId);
+        db.onDestroy();
+
+
     }
 
     public void onGeoLocationsListClick(View view) {
@@ -177,5 +226,23 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
 
     public void onCenterPolylineClick(View view) {
         this.googleMapsWrapper.centerMapVisiblePath();
+    }
+
+    public void onTrackingStatusClick(View view) {
+        if (trackerService == null) return;
+        if (trackerService.isTracking()){
+            trackerService.stopTracking();
+        } else {
+            trackerService.startTracking(this.geoSessionId, 0, 10);
+        }
+        updateTrackerServiceStatusButton();
+    }
+
+    public void onKillServiceClick(View view) {
+        //Unbind from the service
+        //unbindService(serviceConnection);
+
+        // stop service
+        stopService(serviceIntent);
     }
 }

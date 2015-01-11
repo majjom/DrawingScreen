@@ -64,8 +64,8 @@ public class DrawingPointsActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_draw_points) {
-            //IDrawingPointPersistence db = new RandomDrawingPointPersistence();
-            //imageView.addLocations(db.getAllLocations());
+            //IDrawingPointPersistence persistence = new RandomDrawingPointPersistence();
+            //imageView.addLocations(persistence.getAllLocations());
             //imageView.setPointLayerVisible(true);
 
             return true;
@@ -175,6 +175,7 @@ public class DrawingPointsActivity extends Activity {
 
     public void onGeoLocationsMapClick(View view) {
         Intent intent = new Intent(this, GeoLocationsMapsActivity.class);
+
         startActivity(intent);
     }
 }

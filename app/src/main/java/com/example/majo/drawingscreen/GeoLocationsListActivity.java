@@ -7,19 +7,19 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.GeoLocation;
-import com.example.majo.persistence.DrawingPointPersistence;
+import com.example.majo.GoogleMap.LocationConverter;
+import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
-import com.example.majo.persistence.IDrawingPointPersistence;
+import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IGeoLocationPersistence;
+
+import java.util.ArrayList;
 
 
 public class GeoLocationsListActivity extends ActionBarActivity {
 
     ListView geoLocations;
-
-    IGeoLocationPersistence db;
 
     private int geoSessionId;
 
@@ -32,9 +32,15 @@ public class GeoLocationsListActivity extends ActionBarActivity {
         this.geoSessionId = 1;
 
         geoLocations = (ListView)findViewById(R.id.geoLocations);
-        db = new GeoLocationPersistence(this);
 
-        ArrayAdapter<GeoLocation> aa = new ArrayAdapter<GeoLocation>(this, android.R.layout.simple_list_item_1, db.getAllLocations(this.geoSessionId));
+
+        // open DB, get data, close DB
+        IDatabaseConnection db = new DatabaseConnection(this);
+        IGeoLocationPersistence persistence = new GeoLocationPersistence(new DatabaseConnection(this));
+        ArrayList<GeoLocation> locations = persistence.getAllLocations(this.geoSessionId);
+        db.onDestroy();
+
+        ArrayAdapter<GeoLocation> aa = new ArrayAdapter<GeoLocation>(this, android.R.layout.simple_list_item_1, locations);
         geoLocations.setAdapter(aa);
     }
 
