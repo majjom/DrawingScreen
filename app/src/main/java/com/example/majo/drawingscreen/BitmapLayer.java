@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import com.example.majo.BusinessObjects.DrawingPoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by majo on 12-Dec-14.
@@ -111,7 +112,7 @@ public class BitmapLayer {
     }
 
 
-    public void addPoints(ArrayList<DrawingPoint> points) {
+    public void addPoints(List<DrawingPoint> points) {
         for (DrawingPoint point : points){
             this.addPoint(point);
         }

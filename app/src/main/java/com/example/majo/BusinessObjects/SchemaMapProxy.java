@@ -10,6 +10,7 @@ import com.example.majo.persistence.IMappedPointsPersistence;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The proxy supporting LAZY loading of the children.
@@ -51,7 +52,7 @@ public class SchemaMapProxy extends SchemaMap {
     }
 
     @Override
-    public ArrayList<DrawingPoint> getDrawingPoints(){
+    public List<DrawingPoint> getDrawingPoints(){
         if (this.hasLoadedDrawingPoints == false){
             this.drawingPoints = this.drawingPointsChildrenDb.getAllPoints(this.id);
             this.hasLoadedDrawingPoints = true;

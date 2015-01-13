@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DrawingPointsListActivity"
+            android:name="com.example.majo.drawingscreenlist.DrawingPointsListActivity"
             android:label="@string/title_activity_drawing_points_list" >
         </activity>
 
@@ -50,11 +50,11 @@
             android:label="@string/title_activity_geo_locations_maps" >
         </activity>
         <activity
-            android:name=".GeoLocationsListActivity"
+            android:name="com.example.majo.drawingscreenlist.GeoLocationsListActivity"
             android:label="@string/title_activity_geo_locations_list" >
         </activity>
         <activity
-            android:name=".GeoSessionsListActivity"
+            android:name="com.example.majo.drawingscreenlist.GeoSessionsListActivity"
             android:label="@string/title_activity_geo_sessions_list" >
         </activity>
     </application>

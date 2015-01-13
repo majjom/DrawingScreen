@@ -7,29 +7,35 @@ import android.database.Cursor;
 import com.example.majo.BusinessObjects.DrawingPoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by majo on 13-Dec-14.
  */
-public class DrawingPointPersistence extends DatabaseConnection implements IDrawingPointPersistence {
+public class DrawingPointPersistence implements IDrawingPointPersistence {
 
+    IDatabaseConnection connection;
 
-    public DrawingPointPersistence(Context context){
-        super(context);
+    public DrawingPointPersistence(IDatabaseConnection connection){
+        this.connection = connection;
     }
 
     @Override
-    public ArrayList<DrawingPoint> getAllPoints(int mapId) {
-        ArrayList<DrawingPoint> result = new ArrayList<>();
+    public List<DrawingPoint> getAllPoints(int mapId) {
+        List<DrawingPoint> result = new ArrayList<>();
 
         String[] columns = new String[] { MyDatabaseHelper.COL_DP_ID, MyDatabaseHelper.COL_DP_X, MyDatabaseHelper.COL_DP_Y, MyDatabaseHelper.COL_DP_RADIUS};
-        Cursor cur = db.query(MyDatabaseHelper.TAB_DRAWING_POINTS, columns, String.format("%s=?", MyDatabaseHelper.COL_DP_MAP_ID), new String[] { String.valueOf(mapId) }, null, null, MyDatabaseHelper.COL_DP_ORDERING);
+        Cursor cur = connection.getDb().query(MyDatabaseHelper.TAB_DRAWING_POINTS, columns, String.format("%s=?", MyDatabaseHelper.COL_DP_MAP_ID), new String[] { String.valueOf(mapId) }, null, null, MyDatabaseHelper.COL_DP_ORDERING);
 
         while(cur.moveToNext()){
+            int id = cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_DP_ID));
             float x = ConversionHelper.intToDrawingPoint(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_DP_X)));
             float y = ConversionHelper.intToDrawingPoint(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_DP_Y)));
             float radius = ConversionHelper.intToDrawingPoint(cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_DP_RADIUS)));
-            result.add(new DrawingPoint(x, y, radius));
+            DrawingPoint dp = new DrawingPoint(x, y, radius);
+            dp.id = id;
+
+            result.add(dp);
         }
 
         cur.close();
@@ -37,7 +43,7 @@ public class DrawingPointPersistence extends DatabaseConnection implements IDraw
     }
 
     @Override
-    public void addPoints(int mapId, ArrayList<DrawingPoint> points) {
+    public void addPoints(int mapId, List<DrawingPoint> points) {
         int order = 1;
         for (DrawingPoint point : points){
             ContentValues cv = new ContentValues(5);
@@ -53,7 +59,7 @@ public class DrawingPointPersistence extends DatabaseConnection implements IDraw
 
             cv.put(MyDatabaseHelper.COL_MP_ORDERING, order);
 
-            long id = db.insert(MyDatabaseHelper.TAB_DRAWING_POINTS, null, cv);
+            long id = connection.getDb().insert(MyDatabaseHelper.TAB_DRAWING_POINTS, null, cv);
             point.id = (int)id;
             order++;
         }
@@ -61,12 +67,12 @@ public class DrawingPointPersistence extends DatabaseConnection implements IDraw
 
     @Override
     public void deleteAllPoints(int mapId) {
-        db.delete(MyDatabaseHelper.TAB_DRAWING_POINTS, String.format("%s=?", MyDatabaseHelper.COL_DP_MAP_ID), new String[] { String.valueOf(mapId) });
+        connection.getDb().delete(MyDatabaseHelper.TAB_DRAWING_POINTS, String.format("%s=?", MyDatabaseHelper.COL_DP_MAP_ID), new String[] { String.valueOf(mapId) });
     }
 
     @Override
     public void deleteDrawingPoint(DrawingPoint drawingPoint){
-        db.delete(MyDatabaseHelper.TAB_DRAWING_POINTS, String.format("%s=?", MyDatabaseHelper.COL_DP_ID), new String[] { String.valueOf(drawingPoint.id) });
+        connection.getDb().delete(MyDatabaseHelper.TAB_DRAWING_POINTS, String.format("%s=?", MyDatabaseHelper.COL_DP_ID), new String[] { String.valueOf(drawingPoint.id) });
     }
 
 

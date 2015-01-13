@@ -15,7 +15,6 @@ import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -27,6 +26,7 @@ import com.example.majo.GoogleMap.IGpsTrackerService;
 import com.example.majo.GoogleMap.IPolyLineDrawer;
 import com.example.majo.GoogleMap.LocationConverter;
 import com.example.majo.GoogleMap.PolyLineDrawer;
+import com.example.majo.drawingscreenlist.GeoLocationsListActivity;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
 import com.example.majo.persistence.GeoSessionPersistence;
@@ -34,8 +34,6 @@ import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IGeoLocationPersistence;
 import com.example.majo.persistence.IGeoSessionPersistence;
 import com.google.android.gms.maps.SupportMapFragment;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -48,9 +46,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     TextView locationCountText;
     ImageButton trackerServiceStatusButton;
 
-    // context
-    private int geoSessionId;
-    private int mapId;
+    private NavigationContext navigationContext;
 
     private IGpsTrackerService trackerService;
 
@@ -71,9 +67,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         this.geoLocationPersistence = new GeoLocationPersistence(this.dbConnection);
         this.geoSessionPersistence = new GeoSessionPersistence(this.dbConnection);
 
-        this.geoSessionId = ActivityExtras.getGeoSessionIdFromIntent(this);
-        this.mapId = ActivityExtras.getMapIdFromIntent(this);
-        updateContextVariables();
+        this.navigationContext = NavigationContext.getNavigationContextFromActivity(this);
 
         // location manager just for initiation and getting cached position
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -169,7 +163,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     }
 
     public void loadGeoLocationsFromDb(){
-        ArrayList<GeoLocation> locationsFromDb = geoLocationPersistence.getAllLocations(this.geoSessionId);
+        ArrayList<GeoLocation> locationsFromDb = geoLocationPersistence.getAllLocations(this.navigationContext.getGeoSessionId());
         googleMapsWrapper.add(LocationConverter.GeoLocationToLatLng(locationsFromDb));
     }
 
@@ -181,11 +175,6 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         } else {
             trackerServiceStatusButton.setBackgroundResource(R.drawable.ic_play);
         }
-    }
-
-    private void updateContextVariables(){
-        TextView tw = (TextView)findViewById(R.id.contextVariablesView);
-        tw.setText(String.format("mapId:%s, geoSessionId:%s", this.mapId, this.geoSessionId));
     }
 
 
@@ -202,7 +191,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
             Location location = intent.getParcelableExtra(GpsTrackerService.BROADCAST_EXTRA_LOCATION);
             int geoSessionIdTmp = intent.getIntExtra(GpsTrackerService.BROADCAST_EXTRA_GEO_SESSION_ID, -1);
 
-            if (geoSessionIdTmp == geoSessionId){
+            if (geoSessionIdTmp == navigationContext.getGeoSessionId()){
                 addLocation(location);
             }
         }
@@ -238,7 +227,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     /* Buttons click */
     public void onClearMapClick(View view) {
         this.googleMapsWrapper.clear();
-        geoLocationPersistence.deleteAllLocations(this.geoSessionId);
+        geoLocationPersistence.deleteAllLocations(this.navigationContext.getGeoSessionId());
     }
 
     public void onGeoLocationsListClick(View view) {
@@ -275,11 +264,10 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         } else {
             // todo: do something with name
             // create new session if needed
-            if (this.geoSessionId < 0){
-                this.geoSessionId = createNewGeoSessionAndPersist("xxx").id;
-                updateContextVariables();
+            if (this.navigationContext.getGeoSessionId() < 0){
+                this.navigationContext.setGeoSessionId(createNewGeoSessionAndPersist("xxx").id);
             }
-            trackerService.startTracking(this.geoSessionId, 0, 10);
+            trackerService.startTracking(this.navigationContext.getGeoSessionId(), 0, 10);
         }
         updateTrackerServiceStatusButton();
     }
@@ -287,7 +275,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     private GeoSession createNewGeoSessionAndPersist(String name){
         GeoSession geoSession = new GeoSession(name);
         // this also populates the ID
-        this.geoSessionPersistence.addSession(this.mapId, geoSession);
+        this.geoSessionPersistence.addSession(this.navigationContext.getSchemaMapId(), geoSession);
         return geoSession;
     }
 }

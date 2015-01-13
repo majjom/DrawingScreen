@@ -11,16 +11,23 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 
 import com.example.majo.BusinessObjects.DrawingPoint;
+import com.example.majo.drawingscreenlist.DrawingPointsListActivity;
+import com.example.majo.drawingscreenlist.GeoSessionsListActivity;
+import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.DrawingPointPersistence;
+import com.example.majo.persistence.IDatabaseConnection;
+import com.example.majo.persistence.IDrawingPointPersistence;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class DrawingPointsActivity extends Activity {
 
     private DrawingScreenView imageView;
 
-    private DrawingPointPersistence persistence;
+    private IDatabaseConnection db;
+    private IDrawingPointPersistence persistence;
 
     // todo put this away
     private int index;
@@ -42,7 +49,8 @@ public class DrawingPointsActivity extends Activity {
         imageView = (DrawingScreenView)findViewById(R.id.imageView);
         imageView.setImageAsset("melchsee.jpg");
 
-        persistence = new DrawingPointPersistence(this);
+        db = new DatabaseConnection(this);
+        persistence = new DrawingPointPersistence(db);
 
 
     }
@@ -96,8 +104,8 @@ public class DrawingPointsActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (this.persistence!=null){
-            this.persistence.destroy();
+        if (this.db!=null){
+            this.db.destroy();
         }
     }
 
@@ -144,7 +152,7 @@ public class DrawingPointsActivity extends Activity {
     }
 
     public void onDrawPositionClick(View view) {
-        ArrayList<DrawingPoint> points =  this.persistence.getAllPoints(this.schemaMapId);
+        List<DrawingPoint> points =  this.persistence.getAllPoints(this.schemaMapId);
         if (points.size() == 0) {
             this.imageView.setPositionVisibility(false);
             return;

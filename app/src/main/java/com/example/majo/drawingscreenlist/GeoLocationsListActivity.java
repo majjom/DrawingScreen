@@ -1,4 +1,4 @@
-package com.example.majo.drawingscreen;
+package com.example.majo.drawingscreenlist;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.majo.BusinessObjects.GeoLocation;
+import com.example.majo.drawingscreen.R;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
 import com.example.majo.persistence.IDatabaseConnection;

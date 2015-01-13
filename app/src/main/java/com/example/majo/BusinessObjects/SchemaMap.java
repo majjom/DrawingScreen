@@ -2,6 +2,7 @@ package com.example.majo.BusinessObjects;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by moravekm on 19-Dec-14.
@@ -10,7 +11,7 @@ public class SchemaMap extends PersistedObject {
     public String name;
     public Date dateCreated;
     protected ArrayList<GeoSession> geoSessions;
-    protected ArrayList<DrawingPoint> drawingPoints;
+    protected List<DrawingPoint> drawingPoints;
     protected ArrayList<MappedPoint> mappedPoints;
 
     public SchemaMap(String name){
@@ -41,7 +42,7 @@ public class SchemaMap extends PersistedObject {
 
 
 
-    public ArrayList<DrawingPoint> getDrawingPoints(){
+    public List<DrawingPoint> getDrawingPoints(){
         return this.drawingPoints;
     }
 
