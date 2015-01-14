@@ -15,6 +15,12 @@ public class PointMerge {
 
     private int minDistanceBetweenDrawingPoints;
 
+
+    // todo put this away
+    public double getPathSize(ArrayList<GeoLocation> geoLocations){
+        return this.getPathSizeForLocations(geoLocations);
+    }
+
     public PointMerge(){
         this(10);
     }

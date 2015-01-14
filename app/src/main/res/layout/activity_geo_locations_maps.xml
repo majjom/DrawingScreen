@@ -1,110 +1,113 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:orientation="horizontal"
+        >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Text"
-        android:id="@+id/contextVariablesView"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/textView"
-        />
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/clearMap"
-        android:background="@drawable/undo_drawing"
-        android:onClick="onClearMapClick"
-        android:layout_below="@+id/textView"
-        />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/clearMap"
+            android:background="@drawable/undo_drawing"
+            android:onClick="onClearMapClick"
+            />
 
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/geoLocationsList"
-        android:background="@drawable/draw_points_list"
-        android:onClick="onGeoLocationsListClick"
-        android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/clearMap"
-        />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/showGeoLocationsList"
+            android:background="@drawable/path_invisible"
+            android:onClick="onShowGeoLocationsListClick"
+            />
 
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/zoomLevelMinus"
-        android:background="@drawable/ic_minus"
-        android:padding="0dp"
-        android:layout_margin="0dp"
-        android:text="13"
-        android:onClick="onZoomLevelMinusClick"
-        android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/geoLocationsList"
-        />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/zoomLevelMinus"
+            android:background="@drawable/ic_minus"
+            android:padding="0dp"
+            android:layout_margin="0dp"
+            android:text="13"
+            android:onClick="onZoomLevelMinusClick"
+            />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="13"
-        android:id="@+id/zoomLevelValueText"
-        android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/zoomLevelMinus"
-        />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="13"
+            android:id="@+id/zoomLevelValueText"
+            />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/zoomLevelPlus"
-        android:background="@drawable/ic_plus"
-        android:padding="0dp"
-        android:layout_margin="0dp"
-        android:text="13"
-        android:onClick="onZoomLevelPlusClick"
-        android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/zoomLevelValueText"
-        />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/zoomLevelPlus"
+            android:background="@drawable/ic_plus"
+            android:padding="0dp"
+            android:layout_margin="0dp"
+            android:text="13"
+            android:onClick="onZoomLevelPlusClick"
+            />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/centerPolyline"
-        android:background="@drawable/delete_saved_data"
-        android:onClick="onCenterPolylineClick"
-        android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/zoomLevelPlus"
-        />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/centerPolyline"
+            android:background="@drawable/delete_saved_data"
+            android:onClick="onCenterPolylineClick"
+            />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/trackingStatus"
-        android:background="@drawable/ic_play"
-        android:onClick="onTrackingStatusClick"
-        android:layout_below="@+id/textView"
-        android:layout_toRightOf="@+id/centerPolyline"
-        />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/trackingStatus"
+            android:background="@drawable/ic_play"
+            android:onClick="onTrackingStatusClick"
+            />
+    </LinearLayout>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="5"
         android:id="@+id/map"
         android:layout_below="@+id/clearMap"
-        tools:context="com.example.majo.drawingscreen.GeoLocationsMapsActivity"
+        tools:context="com.example.majo.Activities.GeoLocationsMapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_weight="10"
+        android:id="@+id/geoLocationListSection"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/geoLocationsText"
+            />
+
+        <ListView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+
+            android:id="@+id/geoLocationList"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            />
+        </LinearLayout>
+
+</LinearLayout>

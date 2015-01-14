@@ -36,4 +36,8 @@ public class GeoSessionProxy extends GeoSession {
             return this.geoLocations;
         }
     }
+
+    public String toString(){
+        return String.format("%s %s %s no:%s %s", id, name, android.text.format.DateFormat.format("yyy-MM-dd hh:mm:ss", dateCreated), String.valueOf(this.getGeoLocations().size()), isBeingTracked ? "Tracked" : "");
+    }
 }

@@ -10,15 +10,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 
+import com.example.majo.Activities.GeoLocationsMapsActivity;
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.drawingscreenlist.DrawingPointsListActivity;
-import com.example.majo.drawingscreenlist.GeoSessionsListActivity;
+import com.example.majo.Activities.GeoSessionsListActivity;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.DrawingPointPersistence;
 import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IDrawingPointPersistence;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

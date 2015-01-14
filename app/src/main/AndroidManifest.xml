@@ -46,7 +46,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".GeoLocationsMapsActivity"
+            android:name="com.example.majo.Activities.GeoLocationsMapsActivity"
             android:label="@string/title_activity_geo_locations_maps" >
         </activity>
         <activity
@@ -54,7 +54,7 @@
             android:label="@string/title_activity_geo_locations_list" >
         </activity>
         <activity
-            android:name="com.example.majo.drawingscreenlist.GeoSessionsListActivity"
+            android:name="com.example.majo.Activities.GeoSessionsListActivity"
             android:label="@string/title_activity_geo_sessions_list" >
         </activity>
     </application>

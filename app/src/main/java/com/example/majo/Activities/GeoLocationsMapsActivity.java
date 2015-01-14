@@ -1,4 +1,4 @@
-package com.example.majo.drawingscreen;
+package com.example.majo.Activities;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -14,10 +14,15 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.GeoLocation;
 import com.example.majo.BusinessObjects.GeoSession;
 import com.example.majo.GoogleMap.GpsTrackerService;
@@ -26,6 +31,8 @@ import com.example.majo.GoogleMap.IGpsTrackerService;
 import com.example.majo.GoogleMap.IPolyLineDrawer;
 import com.example.majo.GoogleMap.LocationConverter;
 import com.example.majo.GoogleMap.PolyLineDrawer;
+import com.example.majo.drawingscreen.NavigationContext;
+import com.example.majo.drawingscreen.R;
 import com.example.majo.drawingscreenlist.GeoLocationsListActivity;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
@@ -38,13 +45,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeoLocationsMapsActivity extends FragmentActivity {
+public class GeoLocationsMapsActivity extends FragmentActivity implements AdapterView.OnItemClickListener {
 
     private LocationManager locationManager;
 
     IPolyLineDrawer googleMapsWrapper;
 
-    TextView locationCountText;
+    TextView geoLocationsText;
     ImageButton trackerServiceStatusButton;
 
     private NavigationContext navigationContext;
@@ -57,6 +64,11 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     IDatabaseConnection dbConnection;
     IGeoLocationPersistence geoLocationPersistence;
     IGeoSessionPersistence geoSessionPersistence;
+
+    private boolean isGeoLocationListVisible = false;
+    private LinearLayout geoLocationListSection;
+    private ListView geoLocationList;
+    SimpleDeleteListAdapter<GeoLocation> geoLocationAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +89,22 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         SupportMapFragment mMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         googleMapsWrapper = new PolyLineDrawer(mMapFragment.getMap());
 
-        this.locationCountText = (TextView)findViewById(R.id.textView);
+        this.geoLocationsText = (TextView)findViewById(R.id.geoLocationsText);
         this.trackerServiceStatusButton = (ImageButton)findViewById(R.id.trackingStatus);
 
         // load from geoLocationPersistence
-        this.loadGeoLocationsFromDb();
+        List<GeoLocation> locationsFromDb = geoLocationPersistence.getAllLocations(this.navigationContext.getGeoSessionId());
+        googleMapsWrapper.add(LocationConverter.GeoLocationToLatLng(locationsFromDb));
+
+        // geo locations list
+        this.geoLocationList = (ListView)findViewById(R.id.geoLocationList);
+        this.geoLocationListSection = (LinearLayout)findViewById(R.id.geoLocationListSection);
+        this.geoLocationList.setOnItemClickListener(this);
+        this.geoLocationAdapter = new SimpleDeleteListAdapter(GeoLocationsMapsActivity.this, R.layout.list_item_simple_delete, locationsFromDb);
+        this.geoLocationList.setAdapter(geoLocationAdapter);
+
+        updateGeoLocationListSection(this.isGeoLocationListVisible);
+        updateGeoLocationsText();
     }
 
     @Override
@@ -156,16 +179,124 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         super.onDestroy();
     }
 
+
+
+
+
+
+    /* adding and removing locations */
     private void addLocation(Location location){
         if (location != null) {
             googleMapsWrapper.add(LocationConverter.LocationToLatLng(location));
-            this.locationCountText.setText(String.valueOf(googleMapsWrapper.getPoints().size()));
+            // in DB the location already is
+
+            geoLocationAdapter.add(LocationConverter.LocationToGeoLocation(location));
+
+            // update GUI
+            updateGeoLocationsText();
         }
     }
 
-    public void loadGeoLocationsFromDb(){
-        List<GeoLocation> locationsFromDb = geoLocationPersistence.getAllLocations(this.navigationContext.getGeoSessionId());
-        googleMapsWrapper.add(LocationConverter.GeoLocationToLatLng(locationsFromDb));
+    private void removeLocation(GeoLocation location){
+        geoLocationAdapter.remove(location);
+        this.geoLocationPersistence.deleteLocation(location);
+        this.googleMapsWrapper.remove(LocationConverter.GeoLocationToLatLng(location));
+
+        // update GUI
+        updateGeoLocationsText();
+    }
+
+    private void removeAllLocations(){
+        this.googleMapsWrapper.clear();
+        geoLocationPersistence.deleteAllLocations(this.navigationContext.getGeoSessionId());
+        geoLocationAdapter.clear();
+
+        // update GUI
+        updateGeoLocationsText();
+    }
+
+
+
+
+
+
+
+
+
+
+    private void updateGeoLocationsText(){
+        this.geoLocationsText.setText(String.format("points:%d dist:%s MapId:%d SessionId:%d", googleMapsWrapper.getPoints().size(), String.valueOf(Math.round(getPathSizeForLocations(this.geoLocationAdapter.getItems()))), this.navigationContext.getSchemaMapId(), this.navigationContext.getGeoSessionId()));
+    }
+
+
+
+
+
+
+
+
+    // TODO put this section away //////////////////////
+    private double getPathSizeForLocations(List<GeoLocation> geoLocations){
+        double result = 0;
+        Location previousGeoLocation = null;
+        for (GeoLocation geoLocation : geoLocations){
+            if (previousGeoLocation != null)
+            {
+                result += getDistanceForLocations(previousGeoLocation, convertToLocation(geoLocation));
+            }
+            previousGeoLocation = convertToLocation(geoLocation);
+        }
+
+        return result;
+    }
+
+    private Location convertToLocation(GeoLocation geoLocation){
+        Location result = new Location(""); // provider name is unecessary
+        result.setLatitude(geoLocation.latitude);
+        result.setLongitude(geoLocation.longitude);
+        result.setAltitude(geoLocation.altitude);
+        return result;
+    }
+
+
+    private double getDistanceForLocations(Location loc1, Location loc2){
+        if ((loc1 == null) || (loc2 == null)) return 0;
+        return Math.abs(loc1.distanceTo(loc2));
+    }
+    // TODO put this section away //////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void updateGeoLocationListSection(boolean isVisible){
+        this.isGeoLocationListVisible = isVisible;
+        ImageButton im = (ImageButton)findViewById(R.id.showGeoLocationsList);
+        if (isVisible){
+            this.geoLocationListSection.setVisibility(View.VISIBLE);
+            im.setBackgroundResource(R.drawable.path_visible);
+        } else {
+            this.geoLocationListSection.setVisibility(View.GONE);
+            im.setBackgroundResource(R.drawable.path_invisible);
+        }
     }
 
     private void updateTrackerServiceStatusButton(){
@@ -227,13 +358,11 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
 
     /* Buttons click */
     public void onClearMapClick(View view) {
-        this.googleMapsWrapper.clear();
-        geoLocationPersistence.deleteAllLocations(this.navigationContext.getGeoSessionId());
+        removeAllLocations();
     }
 
-    public void onGeoLocationsListClick(View view) {
-        Intent intent = new Intent(this, GeoLocationsListActivity.class);
-        startActivity(intent);
+    public void onShowGeoLocationsListClick(View view) {
+        updateGeoLocationListSection(!this.isGeoLocationListVisible);
     }
 
     public void onZoomLevelPlusClick(View view) {
@@ -278,5 +407,20 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
         // this also populates the ID
         this.geoSessionPersistence.addSession(this.navigationContext.getSchemaMapId(), geoSession);
         return geoSession;
+    }
+
+
+    /* List click */
+    public void onSimpleDeleteListItemClick(View view) {
+        GeoLocation itemToRemove = (GeoLocation)view.getTag();
+        removeLocation(itemToRemove);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        GeoLocation itemClicked = (GeoLocation)parent.getItemAtPosition(position);
+
+        // this shows clicked location and hides the last clicked one
+        this.googleMapsWrapper.showLocation(LocationConverter.GeoLocationToLatLng(itemClicked));
     }
 }

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -25,9 +26,12 @@ public class PolyLineDrawer implements IPolyLineDrawer {
 
     private GoogleMap map;
 
-    private Marker marker;
+
 
     private Polyline polyLine;
+
+    private Marker lastHighlightedPoint;
+    private Marker trackingMarker;
 
     int lastZoomLevel;
     LatLng lastCenteredPoint;
@@ -63,7 +67,7 @@ public class PolyLineDrawer implements IPolyLineDrawer {
         if (points.size() <= 0) return;
 
         this.addPoints(points);
-        this.setMarker(getLastPoint());
+        this.setTrackingMarker(getLastPoint());
         centerMap(getLastPoint(), this.lastZoomLevel);
     }
 
@@ -74,8 +78,13 @@ public class PolyLineDrawer implements IPolyLineDrawer {
         List<LatLng> tmpList = new ArrayList<>();
         tmpList.add(point);
         removePoints(tmpList);
-        this.setMarker(getLastPoint());
-        centerMap(getLastPoint(), this.lastZoomLevel);
+
+        // enter on last point of the line
+        LatLng lastPoint = getLastPoint();
+        if (lastPoint != null){
+            this.setTrackingMarker(lastPoint);
+            centerMap(lastPoint, this.lastZoomLevel);
+        }
     }
 
     @Override
@@ -88,7 +97,8 @@ public class PolyLineDrawer implements IPolyLineDrawer {
         if (this.polyLine != null) this.polyLine.remove();
         this.polyLine = null;
 
-        clearMarker();
+        removeMarker(this.trackingMarker);
+        hideLastLocation();
     }
 
     @Override
@@ -109,7 +119,7 @@ public class PolyLineDrawer implements IPolyLineDrawer {
     @Override
     public void putMarkerAndCenter(LatLng point) {
         if (point == null) return;
-        this.setMarker(point);
+        this.setTrackingMarker(point);
         centerMap(point, this.lastZoomLevel);
     }
 
@@ -126,15 +136,45 @@ public class PolyLineDrawer implements IPolyLineDrawer {
         map.animateCamera(newCamera);
     }
 
+    @Override
+    public void showLocation(LatLng point) {
+        this.removeMarker(this.lastHighlightedPoint);
+
+        if (this.lastHighlightedPoint == null){
+            this.lastHighlightedPoint = addMarker(point, BitmapDescriptorFactory.HUE_GREEN);
+        } else {
+            // if double click on the same point than remove it
+            if ((this.lastHighlightedPoint.getPosition().latitude == point.latitude) && (this.lastHighlightedPoint.getPosition().longitude == point.longitude)) {
+                this.lastHighlightedPoint = null;
+            } else {
+                this.lastHighlightedPoint = addMarker(point, BitmapDescriptorFactory.HUE_GREEN);
+            }
+        }
+    }
+
+    @Override
+    public void hideLastLocation(){
+        this.removeMarker(this.lastHighlightedPoint);
+    }
+
+
     /* MARKER */
-    private void clearMarker(){
+    private void setTrackingMarker(LatLng markPosition) {
+        removeMarker(this.trackingMarker);
+        this.trackingMarker = addMarker(markPosition, BitmapDescriptorFactory.HUE_AZURE);
+    }
+
+
+
+
+    private Marker addMarker(LatLng markPosition, float hue){
+        return map.addMarker(new MarkerOptions().position(markPosition).icon(BitmapDescriptorFactory.defaultMarker(hue)));
+    }
+
+    private void removeMarker(Marker marker){
         if (marker != null){
             marker.remove();
         }
-    }
-    private void setMarker(LatLng markPosition){
-        clearMarker();
-        marker = map.addMarker(new MarkerOptions().position(markPosition));
     }
 
     /* POINTS */

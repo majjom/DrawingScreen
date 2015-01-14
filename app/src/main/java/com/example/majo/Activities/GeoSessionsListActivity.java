@@ -1,4 +1,4 @@
-package com.example.majo.drawingscreenlist;
+package com.example.majo.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,13 +6,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.example.majo.Adapters.GeoSessionListAdapter;
+import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.GeoSession;
 import com.example.majo.GoogleMap.GpsTrackerServiceHelper;
 import com.example.majo.GoogleMap.IGpsTrackerService;
-import com.example.majo.drawingscreen.GeoLocationsMapsActivity;
 import com.example.majo.drawingscreen.NavigationContext;
 import com.example.majo.drawingscreen.R;
 import com.example.majo.persistence.DatabaseConnection;
@@ -26,15 +24,11 @@ import java.util.List;
 public class GeoSessionsListActivity extends Activity implements AdapterView.OnItemClickListener {
     private NavigationContext navigationContext;
 
-    private int trackedSessionId;
-    private List<GeoSession> geoSessionList;
-
-    GeoSessionListAdapter adapter;
-
     IDatabaseConnection dbConnection;
     IGeoSessionPersistence persistence;
 
-    ListView geoSessionsListView;
+    ListView geoSessionList;
+    SimpleDeleteListAdapter<GeoSession> geoSessionListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +42,17 @@ public class GeoSessionsListActivity extends Activity implements AdapterView.OnI
         this.persistence = new GeoSessionPersistence(this.dbConnection);
 
         // gui components basic setup
-        this.geoSessionsListView = (ListView)findViewById(R.id.geoSessions);
-        this.geoSessionsListView.setOnItemClickListener(this);
+        this.geoSessionList = (ListView)findViewById(R.id.geoSessionList);
+        this.geoSessionList.setOnItemClickListener(this);
 
-        refreshAll();
+        refreshList();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        refreshAll();
+        refreshList();
     }
 
     @Override
@@ -71,7 +65,7 @@ public class GeoSessionsListActivity extends Activity implements AdapterView.OnI
         super.onDestroy();
     }
 
-    private List<GeoSession> getGeoSessions(){
+    private List<GeoSession> getGeoSessions(int trackedSessionId){
         List<GeoSession> geoSessions = this.persistence.getAllGeoSessions(this.navigationContext.getSchemaMapId());
 
         // update flag which one is being tracked right now
@@ -92,16 +86,13 @@ public class GeoSessionsListActivity extends Activity implements AdapterView.OnI
         return -1;
     }
 
-    private void refreshAll(){
-        // get tracked session from service (must be before calling getGeoSessions)
-        this.trackedSessionId = getTrackedGeoSessionId();
+    private void refreshList(){
+        // get session list from DB + add one flag from running service
+        List<GeoSession> geoSessionList = getGeoSessions(getTrackedGeoSessionId());
 
-        // get session list from DB
-        this.geoSessionList = getGeoSessions();
-
-        // populate from adapter
-        this.adapter = new GeoSessionListAdapter(GeoSessionsListActivity.this, R.layout.list_item_geo_session, this.geoSessionList);
-        this.geoSessionsListView.setAdapter(adapter);
+        // populate from geoSessionListAdapter
+        this.geoSessionListAdapter = new SimpleDeleteListAdapter(GeoSessionsListActivity.this, R.layout.list_item_simple_delete, geoSessionList);
+        this.geoSessionList.setAdapter(geoSessionListAdapter);
     }
 
 
@@ -110,9 +101,9 @@ public class GeoSessionsListActivity extends Activity implements AdapterView.OnI
 
 
     /*on CLICK*/
-    public void onDeleteClick(View view) {
+    public void onSimpleDeleteListItemClick(View view) {
         GeoSession itemToRemove = (GeoSession)view.getTag();
-        adapter.remove(itemToRemove);
+        geoSessionListAdapter.remove(itemToRemove);
         this.persistence.deleteSession(itemToRemove);
     }
 

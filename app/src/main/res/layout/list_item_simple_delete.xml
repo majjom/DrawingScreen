@@ -8,14 +8,14 @@
         android:layout_width="wrap_content"
         android:layout_weight="1"
         android:layout_height="fill_parent"
-        android:id="@+id/geoSessionListItemText"
+        android:id="@+id/simpleDeleteListText"
         android:text="test"/>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/geoSessionListItemDelete"
-        android:onClick="onDeleteClick"
+        android:id="@+id/simpleDeleteListButton"
+        android:onClick="onSimpleDeleteListItemClick"
         android:background="@drawable/delete_saved_data"
         />
 </LinearLayout>

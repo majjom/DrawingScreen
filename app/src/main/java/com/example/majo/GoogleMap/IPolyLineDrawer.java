@@ -25,4 +25,7 @@ public interface IPolyLineDrawer {
 
     void reCenterMap();
     void centerMapVisiblePath();
+
+    void showLocation(LatLng point);
+    void hideLastLocation();
 }
