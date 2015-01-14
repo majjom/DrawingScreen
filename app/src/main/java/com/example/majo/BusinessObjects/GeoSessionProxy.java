@@ -4,6 +4,7 @@ import com.example.majo.persistence.IGeoLocationPersistence;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by moravekm on 19-Dec-14.
@@ -24,7 +25,7 @@ public class GeoSessionProxy extends GeoSession {
     }
 
     @Override
-    public ArrayList<GeoLocation> getGeoLocations(){
+    public List<GeoLocation> getGeoLocations(){
         if (this.hasLoadedGeoLocations == false){
             this.geoLocations = this.childrenDb.getAllLocations(this.id);
             this.hasLoadedGeoLocations = true;

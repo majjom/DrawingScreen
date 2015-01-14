@@ -36,6 +36,7 @@ import com.example.majo.persistence.IGeoSessionPersistence;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GeoLocationsMapsActivity extends FragmentActivity {
 
@@ -163,7 +164,7 @@ public class GeoLocationsMapsActivity extends FragmentActivity {
     }
 
     public void loadGeoLocationsFromDb(){
-        ArrayList<GeoLocation> locationsFromDb = geoLocationPersistence.getAllLocations(this.navigationContext.getGeoSessionId());
+        List<GeoLocation> locationsFromDb = geoLocationPersistence.getAllLocations(this.navigationContext.getGeoSessionId());
         googleMapsWrapper.add(LocationConverter.GeoLocationToLatLng(locationsFromDb));
     }
 

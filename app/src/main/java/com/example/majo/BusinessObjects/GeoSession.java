@@ -3,6 +3,7 @@ package com.example.majo.BusinessObjects;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by moravekm on 17-Dec-14.
@@ -11,7 +12,7 @@ public class GeoSession extends PersistedObject implements Serializable {
     public String name;
     public Date dateCreated;
     public boolean isBeingTracked = false;
-    protected ArrayList<GeoLocation> geoLocations;
+    protected List<GeoLocation> geoLocations;
 
     public GeoSession(String name){
         this(name, new Date());
@@ -23,7 +24,7 @@ public class GeoSession extends PersistedObject implements Serializable {
         this.geoLocations = new ArrayList<>();
     }
 
-    public ArrayList<GeoLocation> getGeoLocations(){
+    public List<GeoLocation> getGeoLocations(){
         return this.geoLocations;
     }
 

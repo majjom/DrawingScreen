@@ -11,28 +11,36 @@ import com.example.majo.BusinessObjects.SchemaMapProxy;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by moravekm on 19-Dec-14.
  */
-public class SchemaMapPersistence extends DatabaseConnection implements ISchemaMapPersistence {
+public class SchemaMapPersistence implements ISchemaMapPersistence {
+
+    private IDatabaseConnection connection;
     private IGeoSessionPersistence geoSessionPersistence;
     private IMappedPointsPersistence mappedPointsPersistence;
     private IDrawingPointPersistence drawingPointPersistence;
 
-    public SchemaMapPersistence(Context context, IGeoSessionPersistence geoSessionPersistence, IMappedPointsPersistence mappedPointsPersistence, IDrawingPointPersistence drawingPointPersistence) {
-        super(context);
+    public SchemaMapPersistence(IDatabaseConnection connection){
+        this(connection, new GeoSessionPersistence(connection), new MappedPointsPersistence(connection), new DrawingPointPersistence(connection));
+    }
+
+
+    public SchemaMapPersistence(IDatabaseConnection connection, IGeoSessionPersistence geoSessionPersistence, IMappedPointsPersistence mappedPointsPersistence, IDrawingPointPersistence drawingPointPersistence) {
+        this.connection = connection;
         this.geoSessionPersistence = geoSessionPersistence;
         this.mappedPointsPersistence = mappedPointsPersistence;
         this.drawingPointPersistence = drawingPointPersistence;
     }
 
     @Override
-    public ArrayList<SchemaMap> getAllMaps() {
-        ArrayList<SchemaMap> result = new ArrayList<>();
+    public List<SchemaMap> getAllMaps() {
+        List<SchemaMap> result = new ArrayList<>();
 
         String[] columns = new String[] { MyDatabaseHelper.COL_MA_ID, MyDatabaseHelper.COL_MA_NAME, MyDatabaseHelper.COL_MA_DATE_CREATED };
-        Cursor cur = db.query(MyDatabaseHelper.TAB_MAPS, columns, null, null, null, null, MyDatabaseHelper.COL_GS_ID);
+        Cursor cur = this.connection.getDb().query(MyDatabaseHelper.TAB_MAPS, columns, null, null, null, null, MyDatabaseHelper.COL_GS_ID);
 
         while(cur.moveToNext()){
             int id = cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_GS_ID));
@@ -51,22 +59,28 @@ public class SchemaMapPersistence extends DatabaseConnection implements ISchemaM
     }
 
     @Override
-    public void addMaps(ArrayList<SchemaMap> maps) {
+    public void addMap(SchemaMap map) {
+        ContentValues cv = new ContentValues(3);
+
+        long dateCreated = ConversionHelper.dateToLong(map.dateCreated);
+
+        cv.put(MyDatabaseHelper.COL_MA_NAME, map.name);
+        cv.put(MyDatabaseHelper.COL_MA_DATE_CREATED, dateCreated);
+
+        long id = this.connection.getDb().insert(MyDatabaseHelper.TAB_MAPS, null, cv);
+        map.id = (int)id;
+
+        // add children
+        this.geoSessionPersistence.addSessions(map.id, map.getGeoSessions());
+        this.drawingPointPersistence.addPoints(map.id, map.getDrawingPoints());
+        this.mappedPointsPersistence.addPoints(map.id, map.getMappedPoints());
+
+    }
+
+    @Override
+    public void addMaps(List<SchemaMap> maps) {
         for (SchemaMap map : maps){
-            ContentValues cv = new ContentValues(3);
-
-            long dateCreated = ConversionHelper.dateToLong(map.dateCreated);
-
-            cv.put(MyDatabaseHelper.COL_MA_NAME, map.name);
-            cv.put(MyDatabaseHelper.COL_MA_DATE_CREATED, dateCreated);
-
-            long id = db.insert(MyDatabaseHelper.TAB_MAPS, null, cv);
-            map.id = (int)id;
-
-            // add children
-            this.geoSessionPersistence.addSessions(map.id, map.getGeoSessions());
-            this.drawingPointPersistence.addPoints(map.id, map.getDrawingPoints());
-            this.mappedPointsPersistence.addPoints(map.id, map.getMappedPoints());
+            addMap(map);
         }
     }
 
@@ -85,6 +99,6 @@ public class SchemaMapPersistence extends DatabaseConnection implements ISchemaM
         this.mappedPointsPersistence.deleteAllPoints(map.id);
 
         // delete parent
-        db.delete(MyDatabaseHelper.TAB_MAPS, String.format("%s=?", MyDatabaseHelper.COL_MA_ID), new String[] { String.valueOf(map.id) });
+        this.connection.getDb().delete(MyDatabaseHelper.TAB_MAPS, String.format("%s=?", MyDatabaseHelper.COL_MA_ID), new String[]{String.valueOf(map.id)});
     }
 }

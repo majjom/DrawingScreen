@@ -9,9 +9,11 @@ import com.example.majo.BusinessObjects.GeoSession;
 import com.example.majo.BusinessObjects.MappedPoint;
 import com.example.majo.BusinessObjects.SchemaMap;
 import com.example.majo.drawingscreen.DrawingPointsActivity;
+import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.DrawingPointPersistence;
 import com.example.majo.persistence.GeoLocationPersistence;
 import com.example.majo.persistence.GeoSessionPersistence;
+import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IDrawingPointPersistence;
 import com.example.majo.persistence.IGeoLocationPersistence;
 import com.example.majo.persistence.IGeoSessionPersistence;
@@ -21,6 +23,7 @@ import com.example.majo.persistence.MappedPointsPersistence;
 import com.example.majo.persistence.SchemaMapPersistence;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by majo on 14-Dec-14.
@@ -42,7 +45,8 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
     @SmallTest
     public void testDrawingPointPersistence(){
         // arrange
-        IDrawingPointPersistence db = new DrawingPointPersistence(activity);
+        IDatabaseConnection db = new DatabaseConnection(activity);
+        IDrawingPointPersistence persistence = new DrawingPointPersistence(db);
 
         int mapId = 0;
 
@@ -55,10 +59,9 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         points.add(dp);
 
         // act
-        db.deleteAllPoints(mapId);
-        db.addPoints(mapId, points);
-        ArrayList<DrawingPoint> returnPoints = db.getAllPoints(mapId);
-        db.deleteAllPoints(mapId);
+        persistence.deleteAllPoints(mapId);
+        persistence.addPoints(mapId, points);
+        List<DrawingPoint> returnPoints = persistence.getAllPoints(mapId);
 
         // assert
         assertEquals(1, returnPoints.size());
@@ -66,12 +69,27 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         assertEquals(x, returnDp.x);
         assertEquals(y, returnDp.y);
         assertEquals(radius, returnDp.radius);
+
+
+        // act 2
+        persistence.addPoint(mapId, dp);
+        returnPoints = persistence.getAllPoints(mapId);
+        persistence.deleteAllPoints(mapId);
+
+        // assert 2
+        assertEquals(2, returnPoints.size());
+        DrawingPoint returnDp1 = returnPoints.get(0);
+        DrawingPoint returnDp2 = returnPoints.get(1);
+        assertEquals(returnDp1.order + 1, returnDp2.order);
+
+        db.destroy();
     }
 
     @SmallTest
     public void testMappedPointPersistence(){
         // arrange
-        IMappedPointsPersistence db = new MappedPointsPersistence(activity);
+        IDatabaseConnection db = new DatabaseConnection(activity);
+        IMappedPointsPersistence persistence = new MappedPointsPersistence(db);
 
         int mapId = 0;
 
@@ -89,10 +107,9 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         points.add(point);
 
         // act
-        db.deleteAllPoints(mapId);
-        db.addPoints(mapId, points);
-        ArrayList<MappedPoint> returnPoints = db.getAllPoints(mapId);
-        db.deleteAllPoints(mapId);
+        persistence.deleteAllPoints(mapId);
+        persistence.addPoints(mapId, points);
+        List<MappedPoint> returnPoints = persistence.getAllPoints(mapId);
 
         // assert
         assertEquals(1, returnPoints.size());
@@ -105,12 +122,26 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         assertEquals(geoLon, returnPoint.geoLongitude);
         assertEquals(geoAlt, returnPoint.geoAltitude);
         assertEquals(geoRadius, returnPoint.geoRadius);
+
+        // act 2
+        persistence.addPoints(mapId, points);
+        returnPoints = persistence.getAllPoints(mapId);
+        persistence.deleteAllPoints(mapId);
+
+        // assert
+        assertEquals(2, returnPoints.size());
+        MappedPoint returnPoint1 = returnPoints.get(0);
+        MappedPoint returnPoint2 = returnPoints.get(1);
+        assertEquals(returnPoint1.order + 1, returnPoint2.order);
+
+        db.destroy();
     }
 
     @SmallTest
     public void testGeoLocationPersistence(){
         // arrange
-        IGeoLocationPersistence db = new GeoLocationPersistence(activity);
+        IDatabaseConnection db = new DatabaseConnection(activity);
+        IGeoLocationPersistence persistence = new GeoLocationPersistence(db);
 
         int geoSessionId = 0;
 
@@ -124,15 +155,15 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         points.add(point);
 
         // act
-        db.deleteAllLocations(geoSessionId);
-        db.addLocations(geoSessionId, points);
-        ArrayList<GeoLocation> returnPoints = db.getAllLocations(geoSessionId);
-        db.deleteAllLocations(geoSessionId);
+        persistence.deleteAllLocations(geoSessionId);
+        persistence.addLocations(geoSessionId, points);
+        List<GeoLocation> returnPoints = persistence.getAllLocations(geoSessionId);
+        persistence.deleteAllLocations(geoSessionId);
 
         // delete single test
-        db.addLocations(geoSessionId, points);
-        db.deleteLocation(points.get(0));
-        ArrayList<GeoLocation> returnPoints2 = db.getAllLocations(geoSessionId);
+        persistence.addLocations(geoSessionId, points);
+        persistence.deleteLocation(points.get(0));
+        List<GeoLocation> returnPoints2 = persistence.getAllLocations(geoSessionId);
 
         // assert
         assertEquals(1, returnPoints.size());
@@ -145,12 +176,15 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
 
         // assert single delete
         assertEquals(0, returnPoints2.size());
+
+        db.destroy();
     }
 
     @SmallTest
     public void testGeoSessionPersistence(){
         // arrange
-        IGeoSessionPersistence db = new GeoSessionPersistence(activity, new GeoLocationPersistence(activity));
+        IDatabaseConnection db = new DatabaseConnection(activity);
+        IGeoSessionPersistence persistence = new GeoSessionPersistence(db, new GeoLocationPersistence(db));
 
         int mapId = 0;
 
@@ -183,9 +217,9 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         sessions.add(session2);
 
         // act
-        db.deleteAllSessions(mapId);
-        db.addSessions(mapId, sessions);
-        ArrayList<GeoSession> returnSessions = db.getAllGeoSessions(mapId);
+        persistence.deleteAllSessions(mapId);
+        persistence.addSessions(mapId, sessions);
+        List<GeoSession> returnSessions = persistence.getAllGeoSessions(mapId);
 
         // assert
         assertEquals(2, returnSessions.size());
@@ -200,12 +234,15 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         assertEquals(session2.dateCreated, returnSession2.dateCreated);
         assertEquals(2, returnSession2.getGeoLocations().size());
 
-        db.deleteAllSessions(mapId);
+        persistence.deleteAllSessions(mapId);
+
+        db.destroy();
     }
 
     public void testSchemaMapPersistence(){
         // arrange
-        ISchemaMapPersistence db = new SchemaMapPersistence(activity, new GeoSessionPersistence(activity, new GeoLocationPersistence(activity)), new MappedPointsPersistence(activity), new DrawingPointPersistence(activity));
+        IDatabaseConnection db = new DatabaseConnection(activity);
+        ISchemaMapPersistence persistence = new SchemaMapPersistence(db, new GeoSessionPersistence(db, new GeoLocationPersistence(db)), new MappedPointsPersistence(db), new DrawingPointPersistence(db));
 
         int mapId = 0;
 
@@ -244,9 +281,9 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         sms.add(map);
 
         // act
-        db.deleteAllMaps();
-        db.addMaps(sms);
-        ArrayList<SchemaMap> returnMaps = db.getAllMaps();
+        persistence.deleteAllMaps();
+        persistence.addMaps(sms);
+        List<SchemaMap> returnMaps = persistence.getAllMaps();
 
         // assert
         assertEquals(1, returnMaps.size());
@@ -261,6 +298,6 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         assertEquals(1, returnMap.getGeoSessions().get(0).getGeoLocations().size());
         assertEquals(1, returnMap.getGeoSessions().get(1).getGeoLocations().size());
 
-        db.deleteAllMaps();
+        persistence.deleteAllMaps();
     }
 }

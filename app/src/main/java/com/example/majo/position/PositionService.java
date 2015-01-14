@@ -7,6 +7,7 @@ import com.example.majo.BusinessObjects.MappedPoint;
 import com.example.majo.persistence.IMappedPointsPersistence;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by majo on 14-Dec-14.
@@ -63,7 +64,7 @@ public class PositionService implements IPositionService {
         return new DrawingPoint(point.drawingX, point.drawingY, point.drawingRadius);
     }
 
-    private ArrayList<MPLComposite> convertToMPLComposite(ArrayList<MappedPoint> points){
+    private ArrayList<MPLComposite> convertToMPLComposite(List<MappedPoint> points){
         ArrayList<MPLComposite> result = new ArrayList<>();
         for (MappedPoint point : points){
             result.add(new MPLComposite(convertToLocation(point), point));

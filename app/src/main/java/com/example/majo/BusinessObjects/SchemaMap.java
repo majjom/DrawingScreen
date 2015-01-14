@@ -10,9 +10,9 @@ import java.util.List;
 public class SchemaMap extends PersistedObject {
     public String name;
     public Date dateCreated;
-    protected ArrayList<GeoSession> geoSessions;
+    protected List<GeoSession> geoSessions;
     protected List<DrawingPoint> drawingPoints;
-    protected ArrayList<MappedPoint> mappedPoints;
+    protected List<MappedPoint> mappedPoints;
 
     public SchemaMap(String name){
         this(name, new Date());
@@ -26,7 +26,7 @@ public class SchemaMap extends PersistedObject {
         this.mappedPoints = new ArrayList<>();
     }
 
-    public ArrayList<GeoSession> getGeoSessions(){
+    public List<GeoSession> getGeoSessions(){
         return this.geoSessions;
     }
 
@@ -57,7 +57,7 @@ public class SchemaMap extends PersistedObject {
     }
 
 
-    public ArrayList<MappedPoint> getMappedPoints(){
+    public List<MappedPoint> getMappedPoints(){
         return this.mappedPoints;
     }
 

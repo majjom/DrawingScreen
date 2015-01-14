@@ -9,6 +9,7 @@ import com.example.majo.BusinessObjects.GeoSessionProxy;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by moravekm on 17-Dec-14.
@@ -28,8 +29,8 @@ public class GeoSessionPersistence implements IGeoSessionPersistence {
     }
 
     @Override
-    public ArrayList<GeoSession> getAllGeoSessions(int mapId) {
-        ArrayList<GeoSession> result = new ArrayList<>();
+    public List<GeoSession> getAllGeoSessions(int mapId) {
+        List<GeoSession> result = new ArrayList<>();
 
         String[] columns = new String[] { MyDatabaseHelper.COL_GS_ID, MyDatabaseHelper.COL_GS_NAME, MyDatabaseHelper.COL_GS_DATE_CREATED };
         Cursor cur = this.connection.getDb().query(MyDatabaseHelper.TAB_GEO_SESSIONS, columns, String.format("%s=?", MyDatabaseHelper.COL_GS_MAP_ID), new String[] { String.valueOf(mapId) }, null, null, MyDatabaseHelper.COL_GS_ID);
@@ -68,7 +69,7 @@ public class GeoSessionPersistence implements IGeoSessionPersistence {
     }
 
     @Override
-    public void addSessions(int mapId, ArrayList<GeoSession> sessions){
+    public void addSessions(int mapId, List<GeoSession> sessions){
         for (GeoSession session : sessions){
             addSession(mapId, session);
         }

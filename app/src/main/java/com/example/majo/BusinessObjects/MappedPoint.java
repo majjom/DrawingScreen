@@ -13,6 +13,8 @@ public class MappedPoint extends PersistedObject {
     public double geoAltitude;
     public double geoRadius;
 
+    public int order;
+
     public MappedPoint(float drawingX, float drawingY, float drawingRadius
                        , double geoLatitude, double geoLongitude, double geoAltitude, double geoRadius){
         this.drawingX = drawingX;
@@ -23,5 +25,7 @@ public class MappedPoint extends PersistedObject {
         this.geoLongitude = geoLongitude;
         this.geoAltitude = geoAltitude;
         this.geoRadius = geoRadius;
+
+        this.order = -1;
     }
 }

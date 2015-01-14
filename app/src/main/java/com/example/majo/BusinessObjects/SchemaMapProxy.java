@@ -39,7 +39,7 @@ public class SchemaMapProxy extends SchemaMap {
     }
 
     @Override
-    public ArrayList<GeoSession> getGeoSessions(){
+    public List<GeoSession> getGeoSessions(){
         if (this.hasLoadedGeoSessions == false){
             this.geoSessions = this.sessionChildrenDb.getAllGeoSessions(this.id);
             this.hasLoadedGeoSessions = true;
@@ -65,7 +65,7 @@ public class SchemaMapProxy extends SchemaMap {
     }
 
     @Override
-    public ArrayList<MappedPoint> getMappedPoints(){
+    public List<MappedPoint> getMappedPoints(){
         if (this.hasLoadedMappedPoints == false){
             this.mappedPoints = this.mappedPointsChildrenDb.getAllPoints(this.id);
             this.hasLoadedMappedPoints = true;

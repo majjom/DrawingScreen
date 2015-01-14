@@ -8,6 +8,7 @@ import com.example.majo.BusinessObjects.GeoLocation;
 import com.example.majo.BusinessObjects.MappedPoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by majo on 14-Dec-14.
@@ -21,8 +22,8 @@ public class GeoLocationPersistence implements IGeoLocationPersistence {
     }
 
     @Override
-    public ArrayList<GeoLocation> getAllLocations(int geoSessionId) {
-        ArrayList<GeoLocation> result = new ArrayList<>();
+    public List<GeoLocation> getAllLocations(int geoSessionId) {
+        List<GeoLocation> result = new ArrayList<>();
 
         String[] columns = new String[] { MyDatabaseHelper.COL_GL_ID, MyDatabaseHelper.COL_GL_LATITUDE, MyDatabaseHelper.COL_GL_LONGITUDE, MyDatabaseHelper.COL_GL_ALTITUDE, MyDatabaseHelper.COL_GL_RADIUS };
         Cursor cur = connection.getDb().query(MyDatabaseHelper.TAB_GEO_LOCATIONS, columns, String.format("%s=?", MyDatabaseHelper.COL_GL_GEO_SESSION_ID), new String[] { String.valueOf(geoSessionId) }, null, null, MyDatabaseHelper.COL_GL_ORDERING);
@@ -73,7 +74,7 @@ public class GeoLocationPersistence implements IGeoLocationPersistence {
     }
 
     @Override
-    public void addLocations(int geoSessionId, ArrayList<GeoLocation> locations) {
+    public void addLocations(int geoSessionId, List<GeoLocation> locations) {
         for (GeoLocation location : locations){
             addLocation(geoSessionId, location);
         }

@@ -15,6 +15,7 @@ import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IGeoLocationPersistence;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class GeoLocationsListActivity extends ActionBarActivity {
@@ -37,7 +38,7 @@ public class GeoLocationsListActivity extends ActionBarActivity {
         // open DB, get data, close DB
         IDatabaseConnection db = new DatabaseConnection(this);
         IGeoLocationPersistence persistence = new GeoLocationPersistence(new DatabaseConnection(this));
-        ArrayList<GeoLocation> locations = persistence.getAllLocations(this.geoSessionId);
+        List<GeoLocation> locations = persistence.getAllLocations(this.geoSessionId);
         db.destroy();
 
         ArrayAdapter<GeoLocation> aa = new ArrayAdapter<GeoLocation>(this, android.R.layout.simple_list_item_1, locations);

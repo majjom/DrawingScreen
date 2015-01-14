@@ -7,11 +7,13 @@ public class DrawingPoint extends PersistedObject {
     public float x;
     public float y;
     public float radius;
+    public int order;
 
     public DrawingPoint(float x, float y, float radius){
         this.x = x;
         this.y = y;
         this.radius = radius;
+        this.order = -1;
     }
 
     @Override
