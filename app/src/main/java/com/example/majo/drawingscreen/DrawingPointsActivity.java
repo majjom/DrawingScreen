@@ -3,8 +3,6 @@ package com.example.majo.drawingscreen;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -12,13 +10,17 @@ import android.widget.ImageButton;
 
 import com.example.majo.Activities.GeoLocationsMapsActivity;
 import com.example.majo.BusinessObjects.DrawingPoint;
+import com.example.majo.BusinessObjects.MappedPoint;
 import com.example.majo.drawingscreenlist.DrawingPointsListActivity;
 import com.example.majo.Activities.GeoSessionsListActivity;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.DrawingPointPersistence;
 import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IDrawingPointPersistence;
+import com.example.majo.persistence.IMappedPointsPersistence;
+import com.example.majo.persistence.MappedPointsPersistence;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,7 +29,9 @@ public class DrawingPointsActivity extends Activity {
     private DrawingScreenView imageView;
 
     private IDatabaseConnection db;
-    private IDrawingPointPersistence persistence;
+    private IDrawingPointPersistence drawingPointPersistence;
+    private IMappedPointsPersistence mappedPointsPersistence;
+
 
     // todo put this away
     private int index;
@@ -49,55 +53,15 @@ public class DrawingPointsActivity extends Activity {
         imageView = (DrawingScreenView)findViewById(R.id.imageView);
         imageView.setImageAsset("melchsee.jpg");
 
+        //set up database
         db = new DatabaseConnection(this);
-        persistence = new DrawingPointPersistence(db);
+        this.drawingPointPersistence = new DrawingPointPersistence(db);
+        this.mappedPointsPersistence = new MappedPointsPersistence(db);
 
+        // load data
+        imageView.addPoints(drawingPointPersistence.getAllPoints(this.schemaMapId));
+        imageView.loadMappedPoints(convertToDrawingPoints(mappedPointsPersistence.getAllPoints(this.schemaMapId)));
 
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_draw_points) {
-            //IDrawingPointPersistence geoLocationPersistence = new RandomDrawingPointPersistence();
-            //imageView.addLocations(geoLocationPersistence.getAllLocations());
-            //imageView.setPointLayerVisible(true);
-
-            return true;
-        }
-
-        if (id == R.id.action_toggle_point_layer) {
-            //imageView.togglePointLayerVisible();
-
-            return true;
-        }
-
-        if (id == R.id.action_toggle_is_drawing_mode) {
-            imageView.toggleDrawingMode();
-
-            return true;
-        }
-
-        if (id == R.id.action_erase_points) {
-            //imageView.erasePointLayer();
-
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
 
@@ -112,17 +76,25 @@ public class DrawingPointsActivity extends Activity {
 
 
 
+    private List<DrawingPoint> convertToDrawingPoints(List<MappedPoint> mappedPoints){
+        List<DrawingPoint> result = new ArrayList<>();
+        for (MappedPoint mappedPoint : mappedPoints){
+            result.add(new DrawingPoint(mappedPoint.drawingX, mappedPoint.drawingY, mappedPoint.drawingRadius));
+        }
+        return result;
+    }
 
 
 
+    /* On click buttons */
     public void onDisableEnableDrawingClick(View view) {
         ImageButton btn = (ImageButton)findViewById(R.id.disableEnableDrawing);
         if (this.imageView.isDrawingMode()){
             btn.setBackgroundResource(R.drawable.drawing_disabled);
-            this.imageView.toggleDrawingMode();
+            this.imageView.setDrawingMode(!this.imageView.isDrawingMode());
         } else {
             btn.setBackgroundResource(R.drawable.drawing_enabled);
-            this.imageView.toggleDrawingMode();
+            this.imageView.setDrawingMode(!this.imageView.isDrawingMode());
         }
     }
 
@@ -133,7 +105,7 @@ public class DrawingPointsActivity extends Activity {
             btn.setBackgroundResource(R.drawable.path_invisible);
             this.imageView.toggleAllPointsVisible();
         } else {
-            this.imageView.loadAllPoints(this.persistence, this.schemaMapId);
+            this.imageView.loadAllPoints(this.drawingPointPersistence, this.schemaMapId);
             btn.setBackgroundResource(R.drawable.path_visible);
             //this.imageView.toggleAllPointsVisible();
         }
@@ -148,11 +120,11 @@ public class DrawingPointsActivity extends Activity {
     }
 
     public void onSubmitDrawingClick(View view) {
-        this.imageView.submitDrawing(this.persistence, this.schemaMapId);
+        this.imageView.submitDrawing(this.drawingPointPersistence, this.schemaMapId);
     }
 
     public void onDrawPositionClick(View view) {
-        List<DrawingPoint> points =  this.persistence.getAllPoints(this.schemaMapId);
+        List<DrawingPoint> points =  this.drawingPointPersistence.getAllPoints(this.schemaMapId);
         if (points.size() == 0) {
             this.imageView.setPositionVisibility(false);
             return;
@@ -171,7 +143,7 @@ public class DrawingPointsActivity extends Activity {
     }
 
     public void onDeleteAllStoredPointsClick(View view) {
-        this.persistence.deleteAllPoints(this.schemaMapId);
+        this.drawingPointPersistence.deleteAllPoints(this.schemaMapId);
         this.imageView.clearAllPoints();
         onDrawPositionClick(view);
     }

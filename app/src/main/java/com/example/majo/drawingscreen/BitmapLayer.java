@@ -13,18 +13,23 @@ import java.util.List;
 /**
  * Created by majo on 12-Dec-14.
  */
-public class BitmapLayer {
+public class BitmapLayer implements IBitmapLayer {
     private Canvas canvas;
     private Bitmap bitmap;
     private Paint paint;
-    private ArrayList<DrawingPoint> points;
+    private List<DrawingPoint> points;
     private boolean isVisible;
 
-    public BitmapLayer(int width, int height){
+    IBitmapLayerRedrawListener redrawListener;
+
+    private int radius;
+
+    public BitmapLayer(int width, int height, IBitmapLayerRedrawListener redrawListener){
         this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         this.canvas = new Canvas(this.bitmap);
         this.points = new ArrayList<>();
         this.isVisible = true;
+        this.radius = 10;
 
         paint = new Paint();
         paint.setColor(Color.GREEN);
@@ -36,21 +41,36 @@ public class BitmapLayer {
 
     public void setVisibility(boolean isVisible){
         this.isVisible = isVisible;
-    }
-
-    public void toggleVisibility(){
-        setVisibility(!this.isVisible);
+        this.redrawListener.onRedrawRequest();
     }
 
     public boolean isVisible(){
         return this.isVisible;
     }
 
-
-
-    public ArrayList<DrawingPoint> getPoints(){
-        return this.points;
+    public void setColor(int color){
+        this.paint.setColor(color);
+        clean();
+        drawPoints(this.points);
+        this.redrawListener.onRedrawRequest();
     }
+
+    public int getColor(){
+        return this.paint.getColor();
+    }
+
+    public void setRadius(int radius){
+        this.radius = radius;
+        clean();
+        drawPoints(this.points);
+        this.redrawListener.onRedrawRequest();
+    }
+
+    public int getRadius(){
+        return this.radius;
+    }
+
+
 
 
 
@@ -60,24 +80,22 @@ public class BitmapLayer {
     }
 
 
-    public void setPaintColor(int color){
-        this.paint.setColor(color);
+
+
+
+
+
+
+
+
+    public List<DrawingPoint> getPoints(){
+        return this.points;
     }
-
-
-
-
-    public void clean(){
-        this.bitmap.eraseColor(Color.TRANSPARENT);
-    }
-
-
-
-
 
     public void removeAllPoints(){
         this.points = new ArrayList<>();
         clean();
+        this.redrawListener.onRedrawRequest();
     }
 
     public void removeLastPoint() {
@@ -93,6 +111,35 @@ public class BitmapLayer {
             clean();
             drawPoints(this.points);
         }
+        this.redrawListener.onRedrawRequest();
+    }
+
+    @Override
+    public void removePoint(DrawingPoint point) {
+        if (this.points.remove(point)){
+            clean();
+            drawPoints(this.points);
+            this.redrawListener.onRedrawRequest();
+        }
+    }
+
+
+    public void addPoint(DrawingPoint point) {
+        this.points.add(point);
+        drawPoint(point);
+        this.redrawListener.onRedrawRequest();
+    }
+
+    public void addPoints(List<DrawingPoint> points) {
+        for (DrawingPoint point : points){
+            this.addPoint(point);
+        }
+        this.redrawListener.onRedrawRequest();
+    }
+
+
+    private void clean(){
+        this.bitmap.eraseColor(Color.TRANSPARENT);
     }
 
     private void removeLast(){
@@ -101,27 +148,11 @@ public class BitmapLayer {
         }
     }
 
-
-
-
-
-
-    public void addPoint(DrawingPoint point) {
-        this.points.add(point);
-        drawPoint(point);
-    }
-
-
-    public void addPoints(List<DrawingPoint> points) {
-        for (DrawingPoint point : points){
-            this.addPoint(point);
-        }
-    }
-
     private void drawPoint(DrawingPoint point) {
-        this.canvas.drawCircle(point.x, point.y, point.radius, this.paint);
+        this.canvas.drawCircle(point.x, point.y, this.radius, this.paint);
     }
-    private void drawPoints(ArrayList<DrawingPoint> points) {
+
+    private void drawPoints(List<DrawingPoint> points) {
         for (DrawingPoint point : points){
             this.drawPoint(point);
         }

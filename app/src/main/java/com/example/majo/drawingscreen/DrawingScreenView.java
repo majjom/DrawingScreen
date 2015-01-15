@@ -10,25 +10,26 @@ import android.view.View;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.example.majo.BusinessObjects.DrawingPoint;
-import com.example.majo.persistence.IDrawingPointPersistence;
+
+import java.util.List;
 
 import static com.example.majo.drawingscreen.FingerGesture.*;
 
 /**
  * Created by majo on 11-Dec-14.
  */
-public class DrawingScreenView extends SubsamplingScaleImageView implements View.OnTouchListener {
-
-    private boolean isDrawingMode = false;
+public class DrawingScreenView extends SubsamplingScaleImageView implements View.OnTouchListener, IDrawingScreenView {
 
     private BitmapLayer drawingPointsBitmap;
-    private BitmapLayer allPointsBitmap;
+    private BitmapLayer mappedPointsBitmap;
     private BitmapLayer positionBitmap;
 
-    // for simulating painting
-    //private PointF vPrevious;
-    //private PointF vStart;
     private int strokeWidth = 5;
+    private boolean isDrawingMode;
+
+    private PointF vStartPoint;
+    private PointF vPreviousPoint;
+    private boolean isPainting = false;
 
 
     public DrawingScreenView(Context context) {
@@ -61,13 +62,12 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
 
-
+   /* touch handling */
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         return false;
     }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
@@ -101,40 +101,6 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         return super.onTouchEvent(event);
     }
 
-    @Override
-    protected void onDraw(Canvas canvas){
-        super.onDraw(canvas);
-
-        // show the layers
-        if (isImageReady()) {
-            canvas.save();
-            canvas.translate(sourceToViewCoord(0, 0).x, sourceToViewCoord(0, 0).y);
-            canvas.scale(getScale(), getScale());
-
-            drawBitmapLayer(this.allPointsBitmap, canvas);
-            drawBitmapLayer(this.drawingPointsBitmap, canvas);
-            drawBitmapLayer(this.positionBitmap, canvas);
-            canvas.restore();
-        }
-    }
-
-    private void drawBitmapLayer(BitmapLayer bitmapLayer, Canvas canvas){
-        if (bitmapLayer != null && bitmapLayer.isVisible()) {
-            canvas.drawBitmap(bitmapLayer.getBitmap(), 0, 0, null);
-        }
-    }
-
-
-
-
-
-
-
-
-    private PointF vStartPoint;
-    private PointF vPreviousPoint;
-    private boolean isPainting = false;
-
     /**
      *
      * @param x
@@ -156,7 +122,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
                         addDrawingPoint(x, y);
                     } else {
                         // the starting point was given to the drawing, it is the only one -> we are not drawing, so lets remove it
-                        this.drawingPointsBitmap.removeLastPoint();
+                        removeLastPoint();
                     }
                 }
                 // reset
@@ -194,7 +160,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         if (vStartPoint!= null) {
             if (!isPainting) {
                 // the starting point was given to the drawing, it is the only one -> we are not drawing, so lets remove it
-                this.drawingPointsBitmap.removeLastPoint();
+                removeLastPoint();
             }
         }
         resetDrawing();
@@ -212,21 +178,8 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         this.drawingPointsBitmap.addPoint(new DrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y, 10));
     }
 
-
-
-
-
-    public void drawPosition(DrawingPoint point){
-        initiatePositionBitmapLayer();
-        this.positionBitmap.removeAllPoints();
-        this.positionBitmap.addPoint(point);
-        invalidate();
-    }
-
-    public void setPositionVisibility(boolean isVisible){
-        initiatePositionBitmapLayer();
-        this.positionBitmap.setVisibility(isVisible);
-        invalidate();
+    private void removeLastPoint(){
+        this.drawingPointsBitmap.removeLastPoint();
     }
 
 
@@ -234,17 +187,33 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
 
-    public void undoPoint(){
-        if (this.drawingPointsBitmap != null){
-            this.drawingPointsBitmap.removeLastPoint();
-            invalidate();
+
+
+
+
+
+
+    /* drawing*/
+    @Override
+    protected void onDraw(Canvas canvas){
+        super.onDraw(canvas);
+
+        // show the layers
+        if (isImageReady()) {
+            canvas.save();
+            canvas.translate(sourceToViewCoord(0, 0).x, sourceToViewCoord(0, 0).y);
+            canvas.scale(getScale(), getScale());
+
+            drawBitmapLayer(this.mappedPointsBitmap, canvas);
+            drawBitmapLayer(this.drawingPointsBitmap, canvas);
+            drawBitmapLayer(this.positionBitmap, canvas);
+            canvas.restore();
         }
     }
 
-    public void undoDrawing(){
-        if (this.drawingPointsBitmap != null){
-            this.drawingPointsBitmap.removeAllPoints();
-            invalidate();
+    private void drawBitmapLayer(BitmapLayer bitmapLayer, Canvas canvas){
+        if (bitmapLayer != null && bitmapLayer.isVisible()) {
+            canvas.drawBitmap(bitmapLayer.getBitmap(), 0, 0, null);
         }
     }
 
@@ -253,53 +222,22 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
 
-    public void submitDrawing(IDrawingPointPersistence persistence, int schemaMapId){
-        initiateAllPointsBitmapLayer();
-        initiateDrawingPointsBitmapLayer();
-        this.allPointsBitmap.addPoints(this.drawingPointsBitmap.getPoints());
-        persistence.addPoints(schemaMapId, this.drawingPointsBitmap.getPoints());
-        this.drawingPointsBitmap.removeAllPoints();
-        setAllPointsVisible(true);
-        invalidate();
-    }
 
 
 
-    public boolean isAllPointsVisible(){
-        if (this.allPointsBitmap == null) return false;
-        return this.allPointsBitmap.isVisible();
-    }
 
-    public void toggleAllPointsVisible(){
-        setAllPointsVisible(!isAllPointsVisible());
-    }
 
-    public void setAllPointsVisible(boolean allPointsVisible){
-        initiateAllPointsBitmapLayer();
-        this.allPointsBitmap.setVisibility(allPointsVisible);
-        invalidate();
-    }
 
-    public void loadAllPoints(IDrawingPointPersistence persistence, int schemaMapId){
-        setShowAllPoints(true);
-        this.allPointsBitmap.addPoints(persistence.getAllPoints(schemaMapId));
-    }
 
-    public void toggleShowAllPoints(){
-        initiateAllPointsBitmapLayer();
-        setShowAllPoints(!this.allPointsBitmap.isVisible());
-    }
 
-    public void clearAllPoints(){
-        initiateAllPointsBitmapLayer();
-        this.allPointsBitmap.clean();
-    }
 
-    public void setShowAllPoints(boolean showAllPoints){
-        initiateAllPointsBitmapLayer();
-        this.allPointsBitmap.setVisibility(showAllPoints);
-        invalidate();
-    }
+
+
+
+
+
+
+
 
 
 
@@ -310,14 +248,78 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         return this.isDrawingMode;
     }
 
-    public void toggleDrawingMode(){
-        setDrawingMode(!this.isDrawingMode);
-    }
-
     public void setDrawingMode(boolean isDrawingMode){
-        initiateDrawingPointsBitmapLayer();
         this.isDrawingMode = isDrawingMode;
-        invalidate();
+    }
+
+
+
+    @Override
+    public int getStrokeWidth() {
+        return this.strokeWidth;
+    }
+
+    @Override
+    public void setStrokeWidth(int strokeWidth) {
+        this.strokeWidth = strokeWidth;
+    }
+
+    @Override
+    public void setRadius(int radius) {
+        this.drawingPointsBitmap.setRadius(radius);
+    }
+
+    @Override
+    public int getRadius() {
+        return this.drawingPointsBitmap.getRadius();
+    }
+
+    @Override
+    public void setColor(int color) {
+        this.drawingPointsBitmap.setColor(color);
+    }
+
+    @Override
+    public int getColor() {
+        return this.drawingPointsBitmap.getColor();
+    }
+
+    @Override
+    public List<DrawingPoint> getPoints() {
+        return this.drawingPointsBitmap.getPoints();
+    }
+
+    @Override
+    public void addPoint(DrawingPoint point) {
+        this.drawingPointsBitmap.addPoint(point);
+    }
+
+    @Override
+    public void addPoints(List<DrawingPoint> points) {
+        this.drawingPointsBitmap.addPoints(points);
+    }
+
+    @Override
+    public void removePoint(DrawingPoint point) {
+        this.drawingPointsBitmap.removePoint(point);
+    }
+
+    @Override
+    public void removeAllPoints() {
+        this.drawingPointsBitmap.removeAllPoints();
+    }
+
+
+
+
+    @Override
+    public void show() {
+        this.drawingPointsBitmap.setVisibility(true);
+    }
+
+    @Override
+    public void hide() {
+        this.drawingPointsBitmap.setVisibility(true);
     }
 
 
@@ -325,37 +327,44 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
 
-    private void initiateDrawingPointsBitmapLayer(){
-        // if the bitmap is not initiated yet
-        if (this.drawingPointsBitmap == null) {
-            // but only when the background bitmap is already loaded
-            if (getSWidth() > 0 && getSHeight() > 0) {
-                this.drawingPointsBitmap = new BitmapLayer(getSWidth(), getSHeight());
-            }
-        }
+    @Override
+    public void loadMappedPoints(List<DrawingPoint> points) {
+        this.mappedPointsBitmap.removeAllPoints();
+        this.mappedPointsBitmap.addPoints(points);
     }
 
-    private void initiateAllPointsBitmapLayer(){
-        // if the bitmap is not initiated yet
-        if (this.allPointsBitmap == null) {
-            // but only when the background bitmap is already loaded
-            if (getSWidth() > 0 && getSHeight() > 0) {
-                this.allPointsBitmap = new BitmapLayer(getSWidth(), getSHeight());
-                this.allPointsBitmap.setPaintColor(Color.MAGENTA);
-            }
-        }
+    @Override
+    public void showMappedPoints(){
+        this.mappedPointsBitmap.setVisibility(true);
     }
 
-    private void initiatePositionBitmapLayer(){
-        // if the bitmap is not initiated yet
-        if (this.positionBitmap == null) {
-            // but only when the background bitmap is already loaded
-            if (getSWidth() > 0 && getSHeight() > 0) {
-                this.positionBitmap = new BitmapLayer(getSWidth(), getSHeight());
-                this.positionBitmap.setPaintColor(Color.RED);
-            }
-        }
+    @Override
+    public void showMappedPoints(int color, int radius) {
+        this.mappedPointsBitmap.setVisibility(true);
+        this.mappedPointsBitmap.setColor(color);
+        this.mappedPointsBitmap.setRadius(radius);
     }
+
+    @Override
+    public void hideMappedPoints() {
+        this.mappedPointsBitmap.setVisibility(false);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

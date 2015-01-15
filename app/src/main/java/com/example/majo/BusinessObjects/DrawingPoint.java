@@ -6,7 +6,11 @@ package com.example.majo.BusinessObjects;
 public class DrawingPoint extends PersistedObject {
     public float x;
     public float y;
+
+    // todo this is useless and shall be global, remove it from DB and from everywhere
     public float radius;
+
+
     public int order;
 
     public DrawingPoint(float x, float y, float radius){
