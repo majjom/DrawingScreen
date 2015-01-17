@@ -57,6 +57,15 @@
             android:name="com.example.majo.Activities.GeoSessionsListActivity"
             android:label="@string/title_activity_geo_sessions_list" >
         </activity>
+        <activity
+            android:name="com.example.majo.Activities.SchemaMapListActivity"
+            android:label="@string/title_activity_schema_map_list" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

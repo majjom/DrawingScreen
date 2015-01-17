@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.majo.Activities.GeoLocationsMapsActivity;
+import com.example.majo.Activities.SchemaMapListActivity;
 import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.GeoLocation;
@@ -75,6 +76,16 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
         // setup drawing screen
         String assetName = "melchsee_small.jpg";
+        if (this.navigationContext.getSchemaMapId() % 4 == 1){
+            assetName = "melchsee.jpg";
+        }
+        if (this.navigationContext.getSchemaMapId() % 4 == 2){
+            assetName = "Rigi.jpg";
+        }
+        if (this.navigationContext.getSchemaMapId() % 4 == 3){
+            assetName = "squirrel.jpg";
+        }
+
         this.drawingScreenView = (DrawingScreenView)findViewById(R.id.imageView);
         this.drawingScreenView.setImageAsset(assetName);
         this.drawingScreenView.setPointListener(this);
@@ -212,6 +223,13 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
         updateGeoLocationsText();
     }
+
+    public void onSchemaMapListClick(View view) {
+        Intent intent = new Intent(this, SchemaMapListActivity.class);
+
+        startActivity(intent);
+    }
+
 
 
 

@@ -76,4 +76,9 @@ public class SchemaMapProxy extends SchemaMap {
             return this.mappedPoints;
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s %s", id, name, android.text.format.DateFormat.format("yyy-MM-dd hh:mm:ss", dateCreated));
+    }
 }
