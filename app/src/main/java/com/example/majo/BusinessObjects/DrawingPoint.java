@@ -6,8 +6,6 @@ package com.example.majo.BusinessObjects;
 public class DrawingPoint extends PersistedObject {
     public float x;
     public float y;
-
-    // todo this is useless and shall be global, remove it from DB and from everywhere
     public float radius;
 
 
@@ -22,6 +20,6 @@ public class DrawingPoint extends PersistedObject {
 
     @Override
     public String toString() {
-        return String.format("x:%s y:%s r:%s", x, y, radius);
+        return String.format("id:%s x:%s y:%s r:%s", id, x, y, radius);
     }
 }

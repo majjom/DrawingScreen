@@ -410,6 +410,14 @@ public class GeoLocationsMapsActivity extends FragmentActivity implements Adapte
     }
 
 
+
+
+
+
+
+
+
+
     /* List click */
     public void onSimpleDeleteListItemClick(View view) {
         GeoLocation itemToRemove = (GeoLocation)view.getTag();

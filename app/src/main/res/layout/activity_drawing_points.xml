@@ -13,67 +13,33 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/disableEnableDrawing"
+            android:id="@+id/toggleDrawingMode"
             android:background="@drawable/drawing_disabled"
-            android:onClick="onDisableEnableDrawingClick"
+            android:onClick="onToggleDrawingModeClick"
             />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/disableEnablePathVisibility"
+            android:id="@+id/toggleLowerListSectionVisibility"
             android:background="@drawable/path_invisible"
-            android:onClick="onDisableEnablePathVisibilityClick"
+            android:onClick="onToggleLowerListSectionVisibilityClick"
             />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/undoPoint"
-            android:background="@drawable/undo_point"
-            android:onClick="onUndoPointClick"
+            android:id="@+id/toggleDrawingPointsVisibility"
+            android:background="@drawable/path_invisible"
+            android:onClick="onToggleDrawingPointsVisibilityClick"
             />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/undoDrawing"
-            android:background="@drawable/undo_drawing"
-            android:onClick="onUndoDrawingClick"
-            />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/drawPointsList"
-            android:background="@drawable/draw_points_list"
-            android:onClick="onDrawPointsListClick"
-            />
-
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/submitDrawing"
-            android:background="@drawable/submit_drawing"
-            android:onClick="onSubmitDrawingClick"
-            />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/deleteAllStoredPoints"
-            android:background="@drawable/delete_saved_data"
-            android:onClick="onDeleteAllStoredPointsClick"
-            />
-
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/drawPosition"
-            android:background="@drawable/draw_position"
-            android:onClick="onDrawPositionClick"
+            android:id="@+id/toggleMappedPointsVisibility"
+            android:background="@drawable/path_invisible"
+            android:onClick="onToggleMappedPointsVisibilityClick"
             />
 
         <ImageButton
@@ -87,9 +53,9 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/geoSessionsGoto"
+            android:id="@+id/geoSessionsList"
             android:background="@drawable/draw_points_list"
-            android:onClick="onGeoSessionsGotoClick"
+            android:onClick="onGeoSessionsListClick"
             />
     </LinearLayout>
 
@@ -109,21 +75,45 @@
         android:layout_height="fill_parent"
         android:orientation="vertical"
         android:layout_weight="10"
-        android:id="@+id/geoLocationListSection"
+        android:id="@+id/lowerListSection"
         >
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/drawingPointsText"
-            />
+            android:orientation="horizontal"
+            android:id="@+id/lowerListSectionDetail"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:id="@+id/lowerText"
+                />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/deleteAllDrawingPoints"
+                android:background="@drawable/delete_saved_data"
+                android:onClick="onDeleteAllDrawingPointsClick"
+                />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/toggleDrawingMappedPoint"
+                android:background="@drawable/draw_position"
+                android:onClick="onToggleDrawingMappedPointClick"
+                />
+        </LinearLayout>
 
         <ListView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
 
-            android:id="@+id/drawingPointsList"
+            android:id="@+id/lowerList"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             />
