@@ -3,12 +3,13 @@ package com.example.majo.position;
 import android.location.Location;
 
 import com.example.majo.BusinessObjects.DrawingPoint;
+import com.example.majo.BusinessObjects.MappedPoint;
 
 /**
  * Created by majo on 13-Dec-14.
  */
 public interface IPositionService {
-    public DrawingPoint getLastPosition();
+    public MappedPoint getLastPosition();
 
-    public DrawingPoint getCurrentPosition(Location location);
+    public MappedPoint getCurrentPosition(Location location);
 }

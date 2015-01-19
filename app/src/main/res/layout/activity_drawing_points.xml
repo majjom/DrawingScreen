@@ -62,8 +62,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/schemaMapList"
-            android:background="@drawable/draw_position"
+            android:background="@drawable/draw_points_list"
             android:onClick="onSchemaMapListClick"
+            />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/selectGeoSession"
+            android:background="@drawable/submit_drawing"
+            android:onClick="onSelectGeoSessionClick"
+            />
+
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/refreshPosition"
+            android:background="@drawable/submit_drawing"
+            android:onClick="onRefreshPositionClick"
             />
     </LinearLayout>
 
@@ -112,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/toggleDrawingMappedPoint"
-                android:background="@drawable/draw_position"
+                android:background="@drawable/path_invisible"
                 android:onClick="onToggleDrawingMappedPointClick"
                 />
         </LinearLayout>

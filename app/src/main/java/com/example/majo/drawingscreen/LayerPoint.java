@@ -30,9 +30,9 @@ public class LayerPoint {
     }
 
     public LayerPoint(MappedPoint relatedPoint){
-        this.x = relatedDrawingPoint.x;
-        this.y = relatedDrawingPoint.y;
-        this.radius = relatedDrawingPoint.radius;
+        this.x = relatedPoint.drawingX;
+        this.y = relatedPoint.drawingY;
+        this.radius = relatedPoint.drawingRadius;
 
         this.isHighlighted = false;
 
@@ -43,16 +43,20 @@ public class LayerPoint {
     @Override
     public String toString() {
         String result = "";
+
+        if (this.isHighlighted){
+            result += "<H>";
+        }
+
+
         if (this.relatedMappedPoint != null) {
-            result += String.format("id:%s", this.relatedMappedPoint.id);
+            result += this.relatedMappedPoint.toString();
         }
         if (this.relatedDrawingPoint != null) {
-            result += String.format("id:%s", this.relatedDrawingPoint.id);
+            result += this.relatedDrawingPoint.toString();
         }
-        result += String.format(" x:%s y:%s r:%s", this.x, this.y, this.radius);
-        if (this.isHighlighted){
-            result += "HIGHLIGHTED";
-        }
+
+
         return result;
 
     }

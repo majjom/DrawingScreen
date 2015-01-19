@@ -1,6 +1,7 @@
 package com.example.majo.position;
 
 import android.location.Location;
+import android.util.Log;
 
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.MappedPoint;
@@ -15,22 +16,24 @@ import java.util.List;
 public class PositionService implements IPositionService {
 
     private IMappedPointsPersistence db;
+    private int mapId;
 
-    private DrawingPoint lastPosition;
+    private MappedPoint lastPosition;
     private ArrayList<MPLComposite> cache;
 
-    public PositionService(IMappedPointsPersistence db){
+    public PositionService(IMappedPointsPersistence db, int mapId){
         this.db = db;
+        this.mapId = mapId;
     }
 
     @Override
-    public DrawingPoint getLastPosition() {
+    public MappedPoint getLastPosition() {
         return lastPosition;
     }
 
     @Override
-    public DrawingPoint getCurrentPosition(Location location) {
-        lastPosition = convertToDrawingPoint(firstOrDefault(getMatchingPoints(location)));
+    public MappedPoint getCurrentPosition(Location location) {
+        lastPosition = firstOrDefault(getMatchingPoints(location));
         return getLastPosition();
     }
 
@@ -46,11 +49,12 @@ public class PositionService implements IPositionService {
 
         // 01) create cache
         if (cache == null){
-            cache = convertToMPLComposite(db.getAllPoints(0));
+            cache = convertToMPLComposite(db.getAllPoints(this.mapId));
         }
 
         // 02) check distances (linear complexity)
         for (MPLComposite compositePoint : cache){
+            Log.d("dist", String.valueOf(compositePoint.point.id) + ";" + String.valueOf(location.distanceTo(compositePoint.location)) + "/" + String.valueOf(compositePoint.point.geoRadius));
             if (location.distanceTo(compositePoint.location) <= compositePoint.point.geoRadius){
                 result.add(compositePoint.point);
             }

@@ -7,6 +7,7 @@ import com.example.majo.BusinessObjects.GeoLocation;
 import com.example.majo.BusinessObjects.MappedPoint;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by majo on 14-Dec-14.
@@ -30,12 +31,31 @@ public class PointMerge {
     }
 
 
-    public ArrayList<MappedPoint> mergePoints(ArrayList<DrawingPoint> drawingPoints, ArrayList<GeoLocation> geoLocations){
+    public static List<MappedPoint> mergePoints(List<DrawingPoint> drawingPoints, List<GeoLocation> geoLocations){
         if ((drawingPoints == null) || (geoLocations == null)) {
             return null;
         }
 
+
+        // TODO this is too easy thing, rework needed
         ArrayList<MappedPoint> result = new ArrayList<>();
+        if (drawingPoints.size() > geoLocations.size()){
+            int i=0;
+            for (GeoLocation geoLocation : geoLocations){
+                result.add(create(geoLocation, drawingPoints.get(i)));
+                i++;
+            }
+        } else {
+            int i=0;
+            for (DrawingPoint drawingPoint : drawingPoints){
+                result.add(create(geoLocations.get(i), drawingPoint));
+                i++;
+            }
+        }
+
+
+        /*
+
 
         int dpPathSize = getPathSizeForDrawingPoints(drawingPoints);
         double glPathSize = getPathSizeForLocations(geoLocations);
@@ -54,10 +74,14 @@ public class PointMerge {
         }
 
         // interpolate the location points
-
+*/
 
 
         return result;
+    }
+
+    private static MappedPoint create(GeoLocation geoLocation, DrawingPoint drawingPoint){
+        return new MappedPoint(drawingPoint.x, drawingPoint.y, drawingPoint.radius, geoLocation.latitude, geoLocation.longitude, geoLocation.altitude, geoLocation.radius);
     }
 
 

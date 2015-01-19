@@ -1,7 +1,6 @@
 package com.example.majo.drawingscreen;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
@@ -21,6 +20,8 @@ public class NavigationContext implements Serializable {
     private int mappedPointId;
     private int geoSessionId;
     private int geoLocationId;
+
+    private boolean associatingMappedPoints;
 
 
     public int getSchemaMapId() {
@@ -70,6 +71,16 @@ public class NavigationContext implements Serializable {
     }
 
 
+    public boolean getAssociatingMappedPoints() {
+        return associatingMappedPoints;
+    }
+
+    public void setAssociatingMappedPoints(boolean associatingMappedPoints) {
+        this.associatingMappedPoints = associatingMappedPoints;
+        Log("GL:" + this.toString());
+    }
+
+
     public NavigationContext(){
         this.schemaMapId = -1;
         this.drawingPointId = -1;
@@ -106,6 +117,7 @@ public class NavigationContext implements Serializable {
         if (this.mappedPointId > -1) result += "MP:" + String.valueOf(this.mappedPointId);
         if (this.geoSessionId > -1) result += "GS:" + String.valueOf(this.geoSessionId);
         if (this.geoLocationId > -1) result += "GL:" + String.valueOf(this.geoLocationId);
+        if (this.associatingMappedPoints) result += "selMPTrue";
         if (result == "") result = "undef";
         return result;
     }

@@ -54,7 +54,7 @@ public class PointsLayer implements IPointsLayer, IBitmapLayer {
     }
 
     private void init(int width, int height){
-        this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        this.bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
         this.canvas = new Canvas(this.bitmap);
 
         this.paint = new Paint();

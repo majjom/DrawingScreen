@@ -28,4 +28,10 @@ public class MappedPoint extends PersistedObject {
 
         this.order = -1;
     }
+
+    @Override
+    public String toString() {
+        return String.format("MPid:%s x:%s y:%s r:%s lat:%s lon:%s alt:%s r:%s", String.valueOf(this.id), String.valueOf(drawingX), String.valueOf(drawingY), String.valueOf(drawingRadius),
+                String.valueOf(geoLatitude), String.valueOf(geoLatitude), String.valueOf(geoAltitude), String.valueOf(geoRadius));
+    }
 }
