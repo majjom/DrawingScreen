@@ -1,8 +1,9 @@
-package com.example.majo.drawingscreen;
+package com.example.majo.helper;
 
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.GeoLocation;
 import com.example.majo.BusinessObjects.MappedPoint;
+import com.example.majo.drawingscreen.LayerPoint;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;

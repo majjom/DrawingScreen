@@ -1,4 +1,4 @@
-package com.example.majo.drawingscreen;
+package com.example.majo.helper;
 
 import android.app.Activity;
 import android.content.Intent;

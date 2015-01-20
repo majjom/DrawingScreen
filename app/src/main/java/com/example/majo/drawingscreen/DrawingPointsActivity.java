@@ -1,11 +1,8 @@
 package com.example.majo.drawingscreen;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -23,6 +20,8 @@ import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.Activities.GeoSessionsListActivity;
 import com.example.majo.BusinessObjects.MappedPoint;
+import com.example.majo.helper.NavigationContext;
+import com.example.majo.helper.PointConverter;
 import com.example.majo.merging.PointMerge;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.DrawingPointPersistence;
@@ -31,7 +30,6 @@ import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IDrawingPointPersistence;
 import com.example.majo.persistence.IMappedPointsPersistence;
 import com.example.majo.persistence.MappedPointsPersistence;
-import com.example.majo.position.PositionService;
 
 import java.util.List;
 
@@ -39,26 +37,21 @@ import java.util.List;
 public class DrawingPointsActivity extends Activity implements AdapterView.OnItemClickListener, IOnPointListener {
 
     private IDatabaseConnection db;
-    private IDrawingPointPersistence drawingPointPersistence;
-    private GeoLocationPersistence geoLocationPersistence;
-    private IMappedPointsPersistence mappedPointsPersistence;
+
+//    private GeoLocationPersistence geoLocationPersistence;
+//    private IMappedPointsPersistence mappedPointsPersistence;
 
     private DrawingScreenView drawingScreenView;
-    private DrawingPointsLayer drawingPointsLayer;
-    private PointsLayer mappedPointsLayer;
+
+    private DrawingPointManager drawingPointManager;
+    IPointLayer drawingPointLayer;
+    SimpleDeleteListAdapter<DrawingPoint> drawingPointAdapter;
 
     private NavigationContext navigationContext;
 
     private boolean isLowerListVisible = false;
-    SimpleDeleteListAdapter<LayerPoint> layerPointAdapter;
-    SimpleDeleteListAdapter<LayerPoint> mappedPointAdapter;
     private boolean isShowingMappedPoints = false;
 
-    List<LayerPoint> drawingPoints;
-    List<LayerPoint> mappedPoints;
-
-
-    PositionService positionService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +70,19 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
         //set up database and load data
         db = new DatabaseConnection(this);
+
+
         this.drawingPointPersistence = new DrawingPointPersistence(db);
+
+
+
+
+
+
+
+
+
+
         this.mappedPointsPersistence = new MappedPointsPersistence(db);
         this.geoLocationPersistence = new GeoLocationPersistence(db);
 
@@ -85,7 +90,8 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         lowerList.setOnItemClickListener(this);
 
 
-        this.positionService = new PositionService(this.mappedPointsPersistence, this.navigationContext.getSchemaMapId());
+        // todo
+        //this.positionService = new PositionService(this.mappedPointsPersistence, this.navigationContext.getSchemaMapId());
 
 
     }
@@ -160,7 +166,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
         // setup layers
         this.drawingPointsLayer = new DrawingPointsLayer(this, assetName);
-        this.mappedPointsLayer = new PointsLayer(this, assetName);
+        this.mappedPointsLayer = new Layer(this, assetName);
         this.drawingPointsLayer.addPoints(drawingPoints);
         this.mappedPointsLayer.addPoints(mappedPoints);
         this.drawingPointsLayer.setVisibility(false);
@@ -355,6 +361,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
     }
 
     public void onRefreshPositionClick(View view) {
+        /*
         LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -392,6 +399,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
         updateButtons();
         rebindListOfPoints();
+        */
     }
 
     private LayerPoint getCorresponding(MappedPoint mp, List<LayerPoint> lpl){

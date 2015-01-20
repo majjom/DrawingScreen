@@ -102,7 +102,7 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         double geoAlt = 14.43811d;
         double geoRadius = 8.43811d;
 
-        MappedPoint point = new MappedPoint(x, y, radius, geoLat, geoLon, geoAlt, geoRadius);
+        MappedPoint point = new MappedPoint(new DrawingPoint(x, y, radius), new GeoLocation(geoLat, geoLon, geoAlt, geoRadius));
         ArrayList<MappedPoint> points = new ArrayList<>();
         points.add(point);
 
@@ -114,14 +114,14 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         // assert
         assertEquals(1, returnPoints.size());
         MappedPoint returnPoint = returnPoints.get(0);
-        assertEquals(x, returnPoint.drawingX);
-        assertEquals(y, returnPoint.drawingY);
-        assertEquals(radius, returnPoint.drawingRadius);
+        assertEquals(x, returnPoint.drawingPoint.x);
+        assertEquals(y, returnPoint.drawingPoint.y);
+        assertEquals(radius, returnPoint.drawingPoint.radius);
 
-        assertEquals(geoLat, returnPoint.geoLatitude);
-        assertEquals(geoLon, returnPoint.geoLongitude);
-        assertEquals(geoAlt, returnPoint.geoAltitude);
-        assertEquals(geoRadius, returnPoint.geoRadius);
+        assertEquals(geoLat, returnPoint.geoLocation.latitude);
+        assertEquals(geoLon, returnPoint.geoLocation.longitude);
+        assertEquals(geoAlt, returnPoint.geoLocation.altitude);
+        assertEquals(geoRadius, returnPoint.geoLocation.radius);
 
         // act 2
         persistence.addPoints(mapId, points);
@@ -268,7 +268,7 @@ public class PersistenceTest extends ActivityInstrumentationTestCase2<DrawingPoi
         ArrayList<DrawingPoint> dps = new ArrayList<>();
         dps.add(dp);
 
-        MappedPoint mp = new MappedPoint(10,20,30, 10,20,30,40);
+        MappedPoint mp = new MappedPoint(new DrawingPoint(10,20,30), new GeoLocation(10,20,30,40));
         ArrayList<MappedPoint> mps = new ArrayList<>();
         mps.add(mp);
 

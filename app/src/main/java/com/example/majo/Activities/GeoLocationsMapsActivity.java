@@ -14,7 +14,6 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -31,9 +30,8 @@ import com.example.majo.GoogleMap.IGpsTrackerService;
 import com.example.majo.GoogleMap.IPolyLineDrawer;
 import com.example.majo.GoogleMap.LocationConverter;
 import com.example.majo.GoogleMap.PolyLineDrawer;
-import com.example.majo.drawingscreen.NavigationContext;
+import com.example.majo.helper.NavigationContext;
 import com.example.majo.drawingscreen.R;
-import com.example.majo.drawingscreenlist.GeoLocationsListActivity;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoLocationPersistence;
 import com.example.majo.persistence.GeoSessionPersistence;
@@ -42,7 +40,6 @@ import com.example.majo.persistence.IGeoLocationPersistence;
 import com.example.majo.persistence.IGeoSessionPersistence;
 import com.google.android.gms.maps.SupportMapFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GeoLocationsMapsActivity extends FragmentActivity implements AdapterView.OnItemClickListener {

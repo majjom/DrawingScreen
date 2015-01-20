@@ -1,5 +1,7 @@
 package com.example.majo.drawingscreen;
 
+import android.location.Location;
+
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.MappedPoint;
 
@@ -9,14 +11,18 @@ import com.example.majo.BusinessObjects.MappedPoint;
 public class LayerPoint {
 
     // todo - do it with inheritance
-    DrawingPoint relatedDrawingPoint;
-    MappedPoint relatedMappedPoint;
+    public DrawingPoint relatedDrawingPoint;
+    public MappedPoint relatedMappedPoint;
 
 
     public float x;
     public float y;
     public float radius;
+
     public boolean isHighlighted;
+
+    public double distanceToLocation = -1;
+    public Location location;
 
     public LayerPoint(DrawingPoint relatedPoint){
         this.x = relatedPoint.x;
@@ -30,9 +36,9 @@ public class LayerPoint {
     }
 
     public LayerPoint(MappedPoint relatedPoint){
-        this.x = relatedPoint.drawingX;
-        this.y = relatedPoint.drawingY;
-        this.radius = relatedPoint.drawingRadius;
+        this.x = relatedPoint.drawingPoint.x;
+        this.y = relatedPoint.drawingPoint.y;
+        this.radius = relatedPoint.drawingPoint.radius;
 
         this.isHighlighted = false;
 

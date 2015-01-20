@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.example.majo.BusinessObjects.DrawingPoint;
+import com.example.majo.BusinessObjects.GeoLocation;
 import com.example.majo.BusinessObjects.MappedPoint;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class MappedPointsPersistence implements IMappedPointsPersistence {
 
             int order = cur.getInt(cur.getColumnIndex(MyDatabaseHelper.COL_MP_ORDERING));
 
-            MappedPoint mp = new MappedPoint(drawingX, drawingY, drawingRadius, geoLat, geoLon, geoAlt, geoRad);
+            MappedPoint mp = new MappedPoint(new DrawingPoint(drawingX, drawingY, drawingRadius), new GeoLocation(geoLat, geoLon, geoAlt, geoRad));
             mp.id = id;
             mp.order = order;
 
@@ -73,14 +74,14 @@ public class MappedPointsPersistence implements IMappedPointsPersistence {
 
         ContentValues cv = new ContentValues(9);
 
-        int drawingX = ConversionHelper.drawingPointToInt(point.drawingX);
-        int drawingY = ConversionHelper.drawingPointToInt(point.drawingY);
-        int drawingRadius = ConversionHelper.drawingPointToInt(point.drawingRadius);
+        int drawingX = ConversionHelper.drawingPointToInt(point.drawingPoint.x);
+        int drawingY = ConversionHelper.drawingPointToInt(point.drawingPoint.y);
+        int drawingRadius = ConversionHelper.drawingPointToInt(point.drawingPoint.radius);
 
-        int geoLat = ConversionHelper.geoLocationToInt(point.geoLatitude);
-        int geoLon = ConversionHelper.geoLocationToInt(point.geoLongitude);
-        int geoAlt = ConversionHelper.geoLocationToInt(point.geoAltitude);
-        int geoRad = ConversionHelper.geoLocationToInt(point.geoRadius);
+        int geoLat = ConversionHelper.geoLocationToInt(point.geoLocation.latitude);
+        int geoLon = ConversionHelper.geoLocationToInt(point.geoLocation.longitude);
+        int geoAlt = ConversionHelper.geoLocationToInt(point.geoLocation.altitude);
+        int geoRad = ConversionHelper.geoLocationToInt(point.geoLocation.radius);
 
         cv.put(MyDatabaseHelper.COL_MP_MAP_ID, mapId);
         cv.put(MyDatabaseHelper.COL_MP_DRAWING_X, drawingX);

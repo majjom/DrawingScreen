@@ -8,8 +8,11 @@ public class DrawingPoint extends PersistedObject {
     public float y;
     public float radius;
 
-
     public int order;
+
+
+    // not saved to DB
+    public boolean isHighlighted = false;
 
     public DrawingPoint(float x, float y, float radius){
         this.x = x;
@@ -20,6 +23,6 @@ public class DrawingPoint extends PersistedObject {
 
     @Override
     public String toString() {
-        return String.format("id:%s x:%s y:%s r:%s", id, x, y, radius);
+        return String.format("id:%s x:%s y:%s r:%s %s", id, x, y, radius, isHighlighted ? "HIGH" : "");
     }
 }

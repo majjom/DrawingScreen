@@ -12,7 +12,7 @@ import com.example.majo.BusinessObjects.GeoSession;
 import com.example.majo.GoogleMap.GpsTrackerServiceHelper;
 import com.example.majo.GoogleMap.IGpsTrackerService;
 import com.example.majo.drawingscreen.DrawingPointsActivity;
-import com.example.majo.drawingscreen.NavigationContext;
+import com.example.majo.helper.NavigationContext;
 import com.example.majo.drawingscreen.R;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.GeoSessionPersistence;

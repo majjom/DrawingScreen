@@ -1,4 +1,4 @@
-package com.example.majo.position;
+package com.example.majo.distance;
 
 import android.location.Location;
 

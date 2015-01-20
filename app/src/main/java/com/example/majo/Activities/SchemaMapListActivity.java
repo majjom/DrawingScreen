@@ -3,26 +3,19 @@ package com.example.majo.Activities;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.majo.Adapters.SimpleDeleteListAdapter;
-import com.example.majo.BusinessObjects.GeoSession;
 import com.example.majo.BusinessObjects.SchemaMap;
 import com.example.majo.drawingscreen.DrawingPointsActivity;
-import com.example.majo.drawingscreen.NavigationContext;
+import com.example.majo.helper.NavigationContext;
 import com.example.majo.drawingscreen.R;
 import com.example.majo.persistence.DatabaseConnection;
-import com.example.majo.persistence.GeoSessionPersistence;
 import com.example.majo.persistence.IDatabaseConnection;
-import com.example.majo.persistence.IGeoSessionPersistence;
 import com.example.majo.persistence.ISchemaMapPersistence;
 import com.example.majo.persistence.SchemaMapPersistence;
-
-import java.util.List;
 
 public class SchemaMapListActivity extends ActionBarActivity implements AdapterView.OnItemClickListener {
 

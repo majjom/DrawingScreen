@@ -42,13 +42,13 @@ public class PointMerge {
         if (drawingPoints.size() > geoLocations.size()){
             int i=0;
             for (GeoLocation geoLocation : geoLocations){
-                result.add(create(geoLocation, drawingPoints.get(i)));
+                result.add(new MappedPoint(drawingPoints.get(i), geoLocation));
                 i++;
             }
         } else {
             int i=0;
             for (DrawingPoint drawingPoint : drawingPoints){
-                result.add(create(geoLocations.get(i), drawingPoint));
+                result.add(new MappedPoint(drawingPoint, geoLocations.get(i)));
                 i++;
             }
         }
@@ -80,9 +80,7 @@ public class PointMerge {
         return result;
     }
 
-    private static MappedPoint create(GeoLocation geoLocation, DrawingPoint drawingPoint){
-        return new MappedPoint(drawingPoint.x, drawingPoint.y, drawingPoint.radius, geoLocation.latitude, geoLocation.longitude, geoLocation.altitude, geoLocation.radius);
-    }
+
 
 
     /**
