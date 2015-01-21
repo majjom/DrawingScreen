@@ -170,6 +170,11 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
     }
 
     @Override
+    public void highlightPoint(MappedPoint point){
+        this.setHighlightPoint(point, true);
+    }
+
+    @Override
     public void toggleHighlightPoint(MappedPoint point) {
         this.setHighlightPoint(point, !point.isHighlighted);
     }

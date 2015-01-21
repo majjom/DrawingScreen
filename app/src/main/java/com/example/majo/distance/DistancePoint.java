@@ -13,4 +13,9 @@ public class DistancePoint {
         this.point = point;
         this.distance = distance;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s MP:%s", String.valueOf(this.distance), this.point.toString());
+    }
 }

@@ -8,11 +8,12 @@
     <string name="action_toggle_is_drawing_mode">Toggle is drawing mode</string>
     <string name="action_erase_points">Erase points</string>
     <string name="disable_enable_drawing_button_caption">Disable/Enable drawing</string>
-    action_erase_points                    <string name="title_activity_drawing_points_list">DrawingPointsListActivity</string>
+    action_erase_points                        <string name="title_activity_drawing_points_list">DrawingPointsListActivity</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_geo_locations_maps">Map</string>
     <string name="title_activity_geo_locations_list">GeoLocationsListActivity</string>
     <string name="title_activity_geo_sessions_list">GeoSessionsListActivity</string>
     <string name="title_activity_schema_map_list">SchemaMapListActivity</string>
+    <string name="title_activity_tracking">TrackingActivity</string>
 
 </resources>

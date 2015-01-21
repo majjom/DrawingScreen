@@ -29,6 +29,7 @@ import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.IDrawingPointPersistence;
 import com.example.majo.persistence.IMappedPointsPersistence;
 import com.example.majo.persistence.MappedPointsPersistence;
+import com.example.majo.trackingscreen.TrackingActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -398,6 +399,15 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         updateGeoLocationsText();
         updateButtons();
     }
+
+    public void onStartTrackingClick(View view) {
+        Intent intent = new Intent(this, TrackingActivity.class);
+
+        NavigationContext.setNavigationContext(intent, navigationContext);
+
+        startActivity(intent);
+    }
+
 
 
 

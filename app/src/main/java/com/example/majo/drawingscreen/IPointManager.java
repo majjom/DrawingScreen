@@ -28,6 +28,7 @@ public interface IPointManager<T> {
 
     // highlighting
     List<T> getHighlightedPoints();
+    void highlightPoint(T point);
     void toggleHighlightPoint(T point);
     void toggleHighlightPoint(float x, float y);
     void clearHighlight();

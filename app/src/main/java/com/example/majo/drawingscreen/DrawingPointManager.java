@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.DrawingPoint;
+import com.example.majo.BusinessObjects.MappedPoint;
 import com.example.majo.persistence.IDrawingPointPersistence;
 
 import java.util.ArrayList;
@@ -203,6 +204,11 @@ public class DrawingPointManager implements IPointManager<DrawingPoint>, IOnPoin
     @Override
     public void toggleHighlightPoint(DrawingPoint point) {
         setHighlightPoint(point, !point.isHighlighted);
+    }
+
+    @Override
+    public void highlightPoint(DrawingPoint point){
+        this.setHighlightPoint(point, true);
     }
 
     private void setHighlightPoint(DrawingPoint point, boolean isHighlighted) {

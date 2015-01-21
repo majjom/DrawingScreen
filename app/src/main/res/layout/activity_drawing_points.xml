@@ -82,6 +82,14 @@
             android:background="@drawable/submit_drawing"
             android:onClick="onRefreshPositionClick"
             />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/startTracking"
+            android:background="@drawable/abc_btn_radio_to_on_mtrl_015"
+            android:onClick="onStartTrackingClick"
+            />
     </LinearLayout>
 
 
