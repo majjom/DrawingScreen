@@ -21,7 +21,6 @@ import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.Activities.GeoSessionsListActivity;
 import com.example.majo.BusinessObjects.MappedPoint;
 import com.example.majo.helper.NavigationContext;
-import com.example.majo.helper.PointConverter;
 import com.example.majo.merging.PointMerge;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.DrawingPointPersistence;
@@ -37,7 +36,12 @@ import java.util.List;
 
 public class DrawingPointsActivity extends Activity implements AdapterView.OnItemClickListener, IOnPointChanged {
 
+    public static final int PICK_GEO_SESSION_REQUEST = 1;
+
     private IDatabaseConnection db;
+    private IDrawingPointPersistence drawingPointPersistence;
+    private IMappedPointsPersistence mappedPointsPersistence;
+    private GeoLocationPersistence geoLocationPersistence;
 
 //    private GeoLocationPersistence geoLocationPersistence;
 //    private IMappedPointsPersistence mappedPointsPersistence;
@@ -79,7 +83,10 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
 
         //set up database
-        db = new DatabaseConnection(this);
+        this.db = new DatabaseConnection(this);
+        this.drawingPointPersistence = new DrawingPointPersistence(this.db);
+        this.mappedPointsPersistence = new MappedPointsPersistence(this.db);
+        this.geoLocationPersistence = new GeoLocationPersistence(this.db);
 
         // setup common DP + MP -------------------------------
         this.drawingScreenView = (DrawingScreenView)findViewById(R.id.imageView);
@@ -94,7 +101,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         List<DrawingPoint> emptyDrawingPointList = new ArrayList<>();
         this.drawingPointAdapter = new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, emptyDrawingPointList); // first empty
 
-        this.drawingPointManager = new DrawingPointManager(this.drawingPointLayer, this.drawingPointAdapter, new DrawingPointPersistence(this.db), this, this.navigationContext.getSchemaMapId());
+        this.drawingPointManager = new DrawingPointManager(this.drawingPointLayer, this.drawingPointAdapter, this.drawingPointPersistence, this, this.navigationContext.getSchemaMapId());
         this.drawingPointManager.setColor(Color.BLUE);
         this.drawingPointManager.setHighlightColor(Color.RED);
         this.drawingPointManager.setRadius(10);
@@ -114,7 +121,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         List<MappedPoint> emptyMappedPointList = new ArrayList<>();
         this.mappedPointAdapter = new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, emptyMappedPointList); // first empty
 
-        this.mappedPointManager = new MappedPointManager(this.mappedPointLayer, this.mappedPointAdapter, new MappedPointsPersistence(this.db), this, this.navigationContext.getSchemaMapId());
+        this.mappedPointManager = new MappedPointManager(this.mappedPointLayer, this.mappedPointAdapter, this.mappedPointsPersistence, this, this.navigationContext.getSchemaMapId());
         this.mappedPointManager.setColor(Color.GREEN);
         this.mappedPointManager.setHighlightColor(Color.MAGENTA);
 
@@ -147,33 +154,30 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
         this.navigationContext = NavigationContext.getNavigationContextFromActivity(this);
 
-
-
-
-        /*
-        // TODO make this better (mapping DP with GL -> MP)
-        if (this.navigationContext.getAssociatingMappedPoints()){
-            this.navigationContext.setAssociatingMappedPoints(false);
-
-            int mapId = this.navigationContext.getSchemaMapId();
-            int geoSessionId = this.navigationContext.getGeoSessionId();
-
-            List<MappedPoint> mappedPointList = PointMerge.mergePoints(this.drawingPointPersistence.getAllPoints(mapId), this.geoLocationPersistence.getAllLocations(geoSessionId));
-            this.mappedPointsPersistence.addPoints(mapId, mappedPointList);
-
-            this.drawingPointPersistence.deleteAllPoints(mapId);
-
-            Toast.makeText(this, "Created mapped point count:" + String.valueOf(mappedPointList.size()), Toast.LENGTH_SHORT).show();
-        }
-        */
-
-
         this.mappedPointManager.refreshPointsFromDb();
         this.drawingPointManager.refreshPointsFromDb();
         updateButtons();
         updateGeoLocationsText();
 
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_GEO_SESSION_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                this.navigationContext = NavigationContext.getNavigationContextFromActivity(this, data);
+                List<MappedPoint> mappedPointList = PointMerge.mergePoints(this.drawingPointPersistence.getAllPoints(this.navigationContext.getSchemaMapId()),
+                        this.geoLocationPersistence.getAllLocations(this.navigationContext.getGeoSessionId()));
+                this.mappedPointsPersistence.addPoints(this.navigationContext.getSchemaMapId(), mappedPointList);
+
+                this.drawingPointPersistence.deleteAllPoints(this.navigationContext.getSchemaMapId());
+
+                Toast.makeText(this, "Created mapped point count:" + String.valueOf(mappedPointList.size()), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Nothing done", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     // TODO: do this properly
     private String getAssetName(){
@@ -272,10 +276,6 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         if (isShowingMappedPoints){
             this.lowerList.setAdapter(this.mappedPointAdapter);
         } else {
-            /*
-            List<DrawingPoint> points = this.drawingPointManager.getPoints();
-            this.lowerList.setAdapter(new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, points));
-            */
             this.lowerList.setAdapter(this.drawingPointAdapter);
         }
         updateGeoLocationsText();
@@ -385,10 +385,11 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
     public void onSelectGeoSessionClick(View view) {
         Intent intent = new Intent(this, GeoSessionsListActivity.class);
-        navigationContext.setAssociatingMappedPoints(true);
+
+        navigationContext.setSelectingGeoSessionsForMapping(true);
         NavigationContext.setNavigationContext(intent, navigationContext);
 
-        startActivity(intent);
+        startActivityForResult(intent, PICK_GEO_SESSION_REQUEST);
     }
 
     public void onToggleDrawingMappedPointClick(View view) {

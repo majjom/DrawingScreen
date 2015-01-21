@@ -11,7 +11,6 @@ import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.GeoSession;
 import com.example.majo.GoogleMap.GpsTrackerServiceHelper;
 import com.example.majo.GoogleMap.IGpsTrackerService;
-import com.example.majo.drawingscreen.DrawingPointsActivity;
 import com.example.majo.helper.NavigationContext;
 import com.example.majo.drawingscreen.R;
 import com.example.majo.persistence.DatabaseConnection;
@@ -52,6 +51,8 @@ public class GeoSessionsListActivity extends Activity implements AdapterView.OnI
     @Override
     protected void onResume() {
         super.onResume();
+
+        this.navigationContext = NavigationContext.getNavigationContextFromActivity(this);
 
         refreshList();
     }
@@ -112,12 +113,17 @@ public class GeoSessionsListActivity extends Activity implements AdapterView.OnI
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         GeoSession itemClicked = (GeoSession)parent.getItemAtPosition(position);
 
-        if (this.navigationContext.getAssociatingMappedPoints()){
-            Intent intent = new Intent(this, DrawingPointsActivity.class);
-            this.navigationContext.setGeoSessionId(itemClicked.id);
-            NavigationContext.setNavigationContext(intent, navigationContext);
+        if (this.navigationContext.getIsSelectingGeoSessionForMapping()){
 
-            startActivity(intent);
+            // add result data
+            Intent returnIntent = new Intent();
+            this.navigationContext.setGeoSessionId(itemClicked.id);
+            NavigationContext.setNavigationContext(returnIntent, navigationContext);
+
+            setResult(RESULT_OK, returnIntent);
+
+            finish();
+
         } else {
             Intent intent = new Intent(this, GeoLocationsMapsActivity.class);
             this.navigationContext.setGeoSessionId(itemClicked.id);

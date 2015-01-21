@@ -21,7 +21,7 @@ public class NavigationContext implements Serializable {
     private int geoSessionId;
     private int geoLocationId;
 
-    private boolean associatingMappedPoints;
+    private boolean isSelectingGeoSessionsForMapping;
 
 
     public int getSchemaMapId() {
@@ -71,12 +71,12 @@ public class NavigationContext implements Serializable {
     }
 
 
-    public boolean getAssociatingMappedPoints() {
-        return associatingMappedPoints;
+    public boolean getIsSelectingGeoSessionForMapping() {
+        return isSelectingGeoSessionsForMapping;
     }
 
-    public void setAssociatingMappedPoints(boolean associatingMappedPoints) {
-        this.associatingMappedPoints = associatingMappedPoints;
+    public void setSelectingGeoSessionsForMapping(boolean selectingGeoSessionsForMapping) {
+        this.isSelectingGeoSessionsForMapping = selectingGeoSessionsForMapping;
         Log("GL:" + this.toString());
     }
 
@@ -92,6 +92,16 @@ public class NavigationContext implements Serializable {
 
     public static NavigationContext getNavigationContextFromActivity(Activity activity){
         NavigationContext result =  (NavigationContext)activity.getIntent().getSerializableExtra(EXTRA_NAVIGATION_CONTEXT);
+        if (result == null) {
+            result = new NavigationContext();
+        }
+        Log("get:" + result.toString());
+
+        return result;
+    }
+
+    public static NavigationContext getNavigationContextFromActivity(Activity activity, Intent intent){
+        NavigationContext result =  (NavigationContext)intent.getSerializableExtra(EXTRA_NAVIGATION_CONTEXT);
         if (result == null) {
             result = new NavigationContext();
         }
@@ -117,7 +127,7 @@ public class NavigationContext implements Serializable {
         if (this.mappedPointId > -1) result += "MP:" + String.valueOf(this.mappedPointId);
         if (this.geoSessionId > -1) result += "GS:" + String.valueOf(this.geoSessionId);
         if (this.geoLocationId > -1) result += "GL:" + String.valueOf(this.geoLocationId);
-        if (this.associatingMappedPoints) result += "selMPTrue";
+        if (this.isSelectingGeoSessionsForMapping) result += "selMPTrue";
         if (result == "") result = "undef";
         return result;
     }

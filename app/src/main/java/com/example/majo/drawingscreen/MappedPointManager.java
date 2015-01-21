@@ -59,6 +59,10 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         this.onPointChanged.onPointChanged();
     }
 
+    public List<MappedPoint> getPointsFromDatabaseWithoutRefresh(){
+        return this.persistence.getAllPoints(this.schemaMapId);
+    }
+
     @Override
     public int getSchemaMapId() {
         return this.schemaMapId;
@@ -103,10 +107,32 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
     }
 
     public void removePoints(List<MappedPoint> points){
+        // 1) store in local list
+        this.points.removeAll(points);
+
+        // 2) store in DB
+        for (MappedPoint point : points) {
+            this.persistence.deleteMappedPoint(point);
+            // 3) update GUI - list adapter
+            this.listAdapter.remove(point);
+        }
+
+        // 4) update GUI - layer screen
+        this.drawingLayer.clear();
+        this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
 
     @Override
     public MappedPoint removeLastPoint(){
+        if (points.size() > 0) {
+            MappedPoint lastPoint = points.get(points.size() - 1);
+            removePoint(lastPoint);
+            return lastPoint;
+        }
+
         return null;
     }
 

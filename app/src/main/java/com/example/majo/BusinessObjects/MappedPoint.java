@@ -21,6 +21,6 @@ public class MappedPoint extends PersistedObject {
 
     @Override
     public String toString() {
-        return String.format("MPid:%s dp:%s mp:%s", String.valueOf(this.id), this.drawingPoint.toString(), this.geoLocation.toString());
+        return String.format("MPid:%s dp:%s mp:%s %s", String.valueOf(this.id), this.drawingPoint.toString(), this.geoLocation.toString(), isHighlighted ? "HIGH" : "");
     }
 }

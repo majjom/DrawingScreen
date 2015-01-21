@@ -58,6 +58,10 @@ public class DrawingPointManager implements IPointManager<DrawingPoint>, IOnPoin
         this.onPointChanged.onPointChanged();
     }
 
+    public List<DrawingPoint> getPointsFromDatabaseWithoutRefresh(){
+        return this.persistence.getAllPoints(this.schemaMapId);
+    }
+
     @Override
     public int getSchemaMapId() {
         return this.schemaMapId;

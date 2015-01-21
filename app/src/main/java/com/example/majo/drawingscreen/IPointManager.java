@@ -15,6 +15,7 @@ public interface IPointManager<T> {
     void refreshPointsFromDb();
 
     List<T> getPoints();
+    List<T> getPointsFromDatabaseWithoutRefresh();
 
     int getRadius();
     void setRadius(int radius);
