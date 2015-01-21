@@ -36,8 +36,8 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
     /*IDrawingScreenView*/
     private int strokeWidth;
-    private boolean isDrawingMode;
-
+    private int effectiveStrokeWidth;
+    private DrawingMode drawingMode;
 
 
     IOnPointListener onPointListener;
@@ -67,12 +67,14 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
         this.vPreviousPoint = null;
         this.isPainting = false;
 
-        this.strokeWidth = 5;
-        this.isDrawingMode = false;
+        this.strokeWidth = 20;
+        this.effectiveStrokeWidth = 20;
 
         this.layers = new ArrayList<>();
 
         this.onPointListener = null;
+
+        this.drawingMode = DrawingMode.ZOOM;
     }
 
 
@@ -95,7 +97,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
     @Override
     public boolean onTouchEvent(MotionEvent event){
         // 01) normal mode with zooming, touch, double touch....
-        if (!isDrawingMode){
+        if (this.drawingMode == DrawingMode.ZOOM){
             return super.onTouchEvent(event);
         }
 
@@ -143,10 +145,10 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
             case UP:
                 if (vStartPoint!= null) {
                     if (isPainting) {
-                        addDrawingPoint(x, y);
+                        //addDrawingPoint(x, y);
                     } else {
                         // the starting point was given to the drawing, it is the only one -> we are not drawing, so lets remove it
-                        removeLastDrawingPoint();
+                        //removeLastDrawingPoint();
                     }
                 }
                 // reset
@@ -161,9 +163,11 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
                     // if reaching some distance, we are drawing and have the next point to get
                     float vDX = Math.abs(x - vPreviousPoint.x);
                     float vDY = Math.abs(y - vPreviousPoint.y);
-                    if (vDX >= strokeWidth * 5 || vDY >= strokeWidth * 5) {
+                    if (vDX >= effectiveStrokeWidth || vDY >= effectiveStrokeWidth) {
                         handledDrawing = true;
-                        isPainting = true;
+                        if (this.drawingMode == DrawingMode.DRAW) {
+                            isPainting = true;
+                        }
                         vPreviousPoint = new PointF(x, y);
                         addDrawingPoint(x, y);
                     }
@@ -183,8 +187,10 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
     private void handleMultiFingerGesture(float x, float y){
         if (vStartPoint!= null) {
             if (!isPainting) {
-                // the starting point was given to the drawing, it is the only one -> we are not drawing, so lets remove it
-                removeLastDrawingPoint();
+                if (this.drawingMode == DrawingMode.DRAW) {
+                    // the starting point was given to the drawing, it is the only one -> we are not drawing, so lets remove it
+                    removeLastDrawingPoint();
+                }
             }
         }
         resetDrawing();
@@ -204,7 +210,11 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
     private void addDrawingPoint(float vX, float vY){
         if (this.onPointListener != null){
             PointF viewPoint = new PointF(vX, vY);
-            this.onPointListener.addDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+            if (this.drawingMode == DrawingMode.DRAW) {
+                this.onPointListener.addDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+            } else if (this.drawingMode == DrawingMode.HIGHLIGHT){
+                this.onPointListener.highlightDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+            }
         }
     }
 
@@ -302,13 +312,22 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
     @Override
-    public boolean isDrawingMode(){
-        return this.isDrawingMode;
+    public DrawingMode getDrawingMode(){
+        return this.drawingMode;
     }
 
     @Override
-    public void setDrawingMode(boolean isDrawingMode){
-        this.isDrawingMode = isDrawingMode;
+    public void setDrawingMode(DrawingMode drawingMode){
+        // DRAW,ZOOM -> HIGHLIGHT
+        if ((this.drawingMode != DrawingMode.HIGHLIGHT) && (drawingMode == DrawingMode.HIGHLIGHT)){
+            this.effectiveStrokeWidth = 1;
+        }
+        // DRAW,ZOOM <- HIGHLIGHT
+        if ((this.drawingMode == DrawingMode.HIGHLIGHT) && (drawingMode != DrawingMode.HIGHLIGHT)){
+            this.effectiveStrokeWidth = this.strokeWidth;
+        }
+
+        this.drawingMode = drawingMode;
     }
 
     @Override
@@ -319,6 +338,9 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
     @Override
     public void setStrokeWidth(int strokeWidth) {
         this.strokeWidth = strokeWidth;
+        if (this.drawingMode != DrawingMode.HIGHLIGHT){
+            this.effectiveStrokeWidth = this.strokeWidth;
+        }
     }
 
 

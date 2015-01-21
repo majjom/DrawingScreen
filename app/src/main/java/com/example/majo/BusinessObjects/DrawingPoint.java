@@ -13,6 +13,7 @@ public class DrawingPoint extends PersistedObject {
 
     // not saved to DB
     public boolean isHighlighted = false;
+    public int highlightSessionId = 0;
 
     public DrawingPoint(float x, float y, float radius){
         this.x = x;

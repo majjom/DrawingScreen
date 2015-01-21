@@ -18,6 +18,7 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
     SimpleDeleteListAdapter<DrawingPoint> listAdapter;
     IDrawingPointPersistence persistence;
     int schemaMapId;
+    IOnPointChanged onPointChanged;
 
     List<DrawingPoint> points;
 
@@ -25,17 +26,19 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
     int color;
     int radius;
 
-    public DrawingPointManager(IPointLayer drawingLayer, SimpleDeleteListAdapter<DrawingPoint> listAdapter, IDrawingPointPersistence persistence, int schemaMapId){
+    public DrawingPointManager(IPointLayer drawingLayer, SimpleDeleteListAdapter<DrawingPoint> listAdapter, IDrawingPointPersistence persistence, IOnPointChanged onPointChanged, int schemaMapId){
         this.drawingLayer = drawingLayer;
-        this.listAdapter = listAdapter;
         this.persistence = persistence;
         this.schemaMapId = schemaMapId;
+        this.listAdapter = listAdapter;
 
         this.points = new ArrayList<>();
 
         this.color = Color.BLUE;
         this.highlightColor = Color.RED;
         this.radius = 10;
+
+        this.onPointChanged = onPointChanged;
     }
 
 
@@ -50,6 +53,9 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.points, this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
 
     @Override
@@ -90,10 +96,13 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
         this.persistence.addPoint(this.schemaMapId, result);
 
         // 3) update GUI - list
-        this.listAdapter.add(result);
+       this.listAdapter.add(result);
 
         // 4) update GUI - layer
         this.drawingLayer.addPoint(result, this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
 
         return result;
     }
@@ -112,6 +121,9 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.points, this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
 
     @Override
@@ -129,6 +141,9 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.points, this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
 
     @Override
@@ -155,6 +170,9 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
 
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
 
 
@@ -180,10 +198,14 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
 
     @Override
     public void toggleHighlightPoint(DrawingPoint point) {
+        setHighlightPoint(point, !point.isHighlighted);
+    }
+
+    private void setHighlightPoint(DrawingPoint point, boolean isHighlighted) {
         // 1) store in local list
         int pointIdx = this.points.indexOf(point);
         if (pointIdx == -1) return;
-        this.points.get(pointIdx).isHighlighted = !this.points.get(pointIdx).isHighlighted;
+        this.points.get(pointIdx).isHighlighted = isHighlighted;
 
         // 2) store in DB
         // NOPE
@@ -195,36 +217,45 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.points, this.color);
         this.drawingLayer.drawPoints(getHighlightedPoints(), this.highlightColor);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
 
     @Override
     public void toggleHighlightPoint(float x, float y){
         for (DrawingPoint point : this.points){
-            if ((int)point.x == (int)x && (int)point.y == (int)y){
-                toggleHighlightPoint(point);
+            if (isPointInCircle(point.x, point.y, point.radius, x, y)){
+                setHighlightPoint(point, true);
             }
         }
     }
 
     @Override
     public void clearHighlight(){
-            // 1) store in local list
-            for (DrawingPoint point : this.getHighlightedPoints()) {
-                point.isHighlighted = false;
-            }
+        // 1) store in local list
+        for (DrawingPoint point : this.getHighlightedPoints()) {
+            point.isHighlighted = false;
+        }
 
-            // 2) store in DB
-            // NOPE
+        // 2) store in DB
+        // NOPE
 
-            // 3) update GUI - list adapter
-            this.listAdapter.notifyDataSetChanged();
+        // 3) update GUI - list adapter
+        this.listAdapter.notifyDataSetChanged();
 
-            // 4) update GUI - layer screen
-            this.drawingLayer.clear();
-            this.drawingLayer.drawPoints(this.points, this.color);
+        // 4) update GUI - layer screen
+        this.drawingLayer.clear();
+        this.drawingLayer.drawPoints(this.points, this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
 
 
+    private boolean isPointInCircle(double centerX, double centerY, double radius, double x, double y){
+        return  Math.pow(x-centerX, 2) + Math.pow(y-centerY, 2) <= radius*radius;
+    }
 
 
 
@@ -263,6 +294,10 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
 
 
     /******** IOnPointListener ***************/
+
+    public void highlightDrawingPoint(float vX, float vY){
+        this.toggleHighlightPoint(vX, vY);
+    }
 
     @Override
     public DrawingPoint addDrawingPoint(float vX, float vY) {

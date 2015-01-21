@@ -8,6 +8,7 @@ import com.example.majo.BusinessObjects.DrawingPoint;
  */
 
 public interface IOnPointListener {
+    void highlightDrawingPoint(float vX, float vY);
     DrawingPoint addDrawingPoint(float vX, float vY);
     DrawingPoint removeLastDrawingPoint();
 }

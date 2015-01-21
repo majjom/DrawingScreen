@@ -36,7 +36,7 @@ public class DistanceCalculatorTest extends InstrumentationTestCase {
         loc2.setLongitude(loc22.longitude);
 
         // act
-        double distance = DistanceCalculator.getDistance(mp1, loc1);
+        double distance = DistanceCalculator.getDistance(mp1, loc2);
         float distanceGoogle = loc1.distanceTo(loc2);
 
         // assert
