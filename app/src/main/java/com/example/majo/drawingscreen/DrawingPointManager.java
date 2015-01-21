@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by majo on 20-Jan-15.
  */
-public class DrawingPointManager implements IDrawingPointManager {
+public class DrawingPointManager implements IDrawingPointManager, IOnPointListener {
 
     IPointLayer drawingLayer;
     SimpleDeleteListAdapter<DrawingPoint> listAdapter;
@@ -73,11 +73,11 @@ public class DrawingPointManager implements IDrawingPointManager {
     }
 
     @Override
-    public DrawingPoint addPoint(int x, int y) {
+    public DrawingPoint addPoint(float x, float y) {
         // first check if we dont have the one yet as the last point
         if (points.size() > 0) {
             DrawingPoint lastPoint = points.get(points.size() - 1);
-            if ((int)lastPoint.x == x && (int)lastPoint.y == y){
+            if ((int)lastPoint.x == (int)x && (int)lastPoint.y == (int)y){
                 return null;
             }
         }
@@ -132,11 +132,14 @@ public class DrawingPointManager implements IDrawingPointManager {
     }
 
     @Override
-    public void removeLastPoint() {
+    public DrawingPoint removeLastPoint() {
         if (points.size() > 0) {
             DrawingPoint lastPoint = points.get(points.size() - 1);
             removePoint(lastPoint);
+            return lastPoint;
         }
+
+        return null;
     }
 
     @Override
@@ -195,9 +198,9 @@ public class DrawingPointManager implements IDrawingPointManager {
     }
 
     @Override
-    public void toggleHighlightPoint(int x, int y){
+    public void toggleHighlightPoint(float x, float y){
         for (DrawingPoint point : this.points){
-            if (point.x == x && point.y == y){
+            if ((int)point.x == (int)x && (int)point.y == (int)y){
                 toggleHighlightPoint(point);
             }
         }
@@ -205,20 +208,20 @@ public class DrawingPointManager implements IDrawingPointManager {
 
     @Override
     public void clearHighlight(){
-        // 1) store in local list
-        for (DrawingPoint point : this.getHighlightedPoints()) {
-            point.isHighlighted = false;
-        }
+            // 1) store in local list
+            for (DrawingPoint point : this.getHighlightedPoints()) {
+                point.isHighlighted = false;
+            }
 
-        // 2) store in DB
-        // NOPE
+            // 2) store in DB
+            // NOPE
 
-        // 3) update GUI - list adapter
-        this.listAdapter.notifyDataSetChanged();
+            // 3) update GUI - list adapter
+            this.listAdapter.notifyDataSetChanged();
 
-        // 4) update GUI - layer screen
-        this.drawingLayer.clear();
-        this.drawingLayer.drawPoints(this.points, this.color);
+            // 4) update GUI - layer screen
+            this.drawingLayer.clear();
+            this.drawingLayer.drawPoints(this.points, this.color);
     }
 
 
@@ -259,11 +262,15 @@ public class DrawingPointManager implements IDrawingPointManager {
 
 
 
+    /******** IOnPointListener ***************/
 
+    @Override
+    public DrawingPoint addDrawingPoint(float vX, float vY) {
+        return this.addPoint(vX, vY);
+    }
 
-
-
-
-
-
+    @Override
+    public DrawingPoint removeLastDrawingPoint() {
+        return this.removeLastPoint();
+    }
 }

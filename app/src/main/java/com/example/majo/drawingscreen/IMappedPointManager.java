@@ -1,33 +1,27 @@
 package com.example.majo.drawingscreen;
 
 import com.example.majo.BusinessObjects.DrawingPoint;
+import com.example.majo.BusinessObjects.MappedPoint;
 
 import java.util.List;
 
 /**
- * Created by majo on 20-Jan-15.
+ * Created by moravekm on 21-Jan-15.
  */
-public interface IDrawingPointManager {
-
+public interface IMappedPointManager {
     // data
     int getSchemaMapId();
 
     void refreshPointsFromDb();
 
-    List<DrawingPoint> getPoints();
+    List<MappedPoint> getPoints();
 
-    int getRadius();
-    void setRadius(int radius);
-    DrawingPoint addPoint(float x, float y);
-
-    void removePoint(DrawingPoint point);
-    void removePoints(List<DrawingPoint> points);
-    DrawingPoint removeLastPoint();
     void removeAllPoints();
+    void removePoint(MappedPoint point);
 
     // highlighting
-    List<DrawingPoint> getHighlightedPoints();
-    void toggleHighlightPoint(DrawingPoint point);
+    List<MappedPoint> getHighlightedPoints();
+    void toggleHighlightPoint(MappedPoint point);
     void toggleHighlightPoint(float x, float y);
     void clearHighlight();
 
@@ -38,5 +32,4 @@ public interface IDrawingPointManager {
 
     void setColor(int color);
     int getColor();
-
 }

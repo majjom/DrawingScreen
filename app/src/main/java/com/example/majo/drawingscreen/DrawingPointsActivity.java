@@ -34,23 +34,32 @@ import com.example.majo.persistence.MappedPointsPersistence;
 import java.util.List;
 
 
-public class DrawingPointsActivity extends Activity implements AdapterView.OnItemClickListener, IOnPointListener {
+public class DrawingPointsActivity extends Activity implements AdapterView.OnItemClickListener {
 
     private IDatabaseConnection db;
 
 //    private GeoLocationPersistence geoLocationPersistence;
 //    private IMappedPointsPersistence mappedPointsPersistence;
 
+    // common UI for DP + MP
+    ListView lowerList;
     private DrawingScreenView drawingScreenView;
 
+    // DP only
+    private Layer drawingPointLayer;
+    private SimpleDeleteListAdapter<DrawingPoint> drawingPointAdapter;
     private DrawingPointManager drawingPointManager;
-    IPointLayer drawingPointLayer;
-    SimpleDeleteListAdapter<DrawingPoint> drawingPointAdapter;
+
+    // MP only
+    private Layer mappedPointLayer;
+    private SimpleDeleteListAdapter<MappedPoint> mappedPointAdapter;
+    private MappedPointManager mappedPointManager;
+
 
     private NavigationContext navigationContext;
 
-    private boolean isLowerListVisible = false;
-    private boolean isShowingMappedPoints = false;
+    private boolean isLowerListVisible;
+    private boolean isShowingMappedPoints;
 
 
     @Override
@@ -68,30 +77,50 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
 
 
-        //set up database and load data
+        //set up database
         db = new DatabaseConnection(this);
 
+        // setup common DP + MP -------------------------------
+        this.drawingScreenView = (DrawingScreenView)findViewById(R.id.imageView);
+        this.drawingScreenView.setImageAsset(this.getAssetName());
 
-        this.drawingPointPersistence = new DrawingPointPersistence(db);
+        this.lowerList = (ListView)findViewById(R.id.lowerList);
+        this.lowerList.setOnItemClickListener(this);
+
+        // setup DP -------------------------------
+        this.drawingPointLayer = new Layer(this, this.getAssetName());
+
+        this.drawingPointAdapter = new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, null); // first empty
+
+        this.drawingPointManager = new DrawingPointManager(this.drawingPointLayer, this.drawingPointAdapter, new DrawingPointPersistence(this.db), this.navigationContext.getSchemaMapId());
+        this.drawingPointManager.setColor(Color.BLUE);
+        this.drawingPointManager.setHighlightColor(Color.RED);
+        this.drawingPointManager.setRadius(10);;
+
+        // connecting DP -------------------------------
+        this.lowerList.setAdapter(this.drawingPointAdapter);
+        this.drawingScreenView.addLayer(this.drawingPointLayer);
+        this.drawingScreenView.setPointListener(this.drawingPointManager);
 
 
+        // setup MP -------------------------------
+        this.mappedPointLayer = new Layer(this, this.getAssetName());
+
+        this.mappedPointAdapter = new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, null); // first empty
+
+        this.mappedPointManager = new MappedPointManager(this.mappedPointLayer, this.mappedPointAdapter, new MappedPointsPersistence(this.db), this.navigationContext.getSchemaMapId());
+        this.mappedPointManager.setColor(Color.GREEN);
+        this.mappedPointManager.setHighlightColor(Color.CYAN);
+
+        // connecting DP -------------------------------
+        this.drawingScreenView.addLayer(this.mappedPointLayer);
 
 
-
-
-
-
-
-
-        this.mappedPointsPersistence = new MappedPointsPersistence(db);
-        this.geoLocationPersistence = new GeoLocationPersistence(db);
-
-        ListView lowerList = (ListView)findViewById(R.id.lowerList);
-        lowerList.setOnItemClickListener(this);
-
-
-        // todo
-        //this.positionService = new PositionService(this.mappedPointsPersistence, this.navigationContext.getSchemaMapId());
+        // refresh rest of UI
+        setIsLowerListVisible(false);
+        setIsShowingMappedPoints(false);
+        updateButtons();
+        updateGeoLocationsText();
 
 
     }
@@ -114,6 +143,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
 
 
+        /*
         // TODO make this better (mapping DP with GL -> MP)
         if (this.navigationContext.getAssociatingMappedPoints()){
             this.navigationContext.setAssociatingMappedPoints(false);
@@ -128,27 +158,18 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
             Toast.makeText(this, "Created mapped point count:" + String.valueOf(mappedPointList.size()), Toast.LENGTH_SHORT).show();
         }
+        */
 
 
+        this.mappedPointManager.refreshPointsFromDb();
+        this.drawingPointManager.refreshPointsFromDb();
+        updateButtons();
+        updateGeoLocationsText();
 
+    }
 
-
-
-
-
-
-        // get from DB and refresh
-
-
-
-
-        drawingPoints = PointConverter.drawingPointToLayerPoint(drawingPointPersistence.getAllPoints(this.navigationContext.getSchemaMapId()));
-        mappedPoints = PointConverter.mappedPointToLayerPoint(mappedPointsPersistence.getAllPoints(this.navigationContext.getSchemaMapId()));
-
-
-
-
-        // setup drawing screen
+    // TODO: do this properly
+    private String getAssetName(){
         String assetName = "melchsee_small.jpg";
         if (this.navigationContext.getSchemaMapId() % 4 == 1){
             assetName = "melchsee.jpg";
@@ -159,56 +180,16 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         if (this.navigationContext.getSchemaMapId() % 4 == 3){
             assetName = "squirrel.jpg";
         }
-
-        this.drawingScreenView = (DrawingScreenView)findViewById(R.id.imageView);
-        this.drawingScreenView.setImageAsset(assetName);
-        this.drawingScreenView.setPointListener(this);
-
-        // setup layers
-        this.drawingPointsLayer = new DrawingPointsLayer(this, assetName);
-        this.mappedPointsLayer = new Layer(this, assetName);
-        this.drawingPointsLayer.addPoints(drawingPoints);
-        this.mappedPointsLayer.addPoints(mappedPoints);
-        this.drawingPointsLayer.setVisibility(false);
-        this.mappedPointsLayer.setVisibility(false);
-        this.mappedPointsLayer.setColor(Color.BLUE);
-
-        // connect layers with Screen drawing
-        this.drawingScreenView.addLayer(this.drawingPointsLayer);
-        this.drawingScreenView.addLayer(this.mappedPointsLayer);
-
-
-
-        // lower list section
-
-        rebindListOfPoints();
-
-
-        updateLowerListSection();
-        updateGeoLocationsText();
-
-        updateButtons();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return assetName;
     }
 
+
+
+
+
+
+
+    /* update gui */
     private void updateButtons(){
         ImageButton btn = (ImageButton)findViewById(R.id.toggleDrawingMode);
         if (this.drawingScreenView.isDrawingMode()){
@@ -225,14 +206,14 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         }
 
         btn = (ImageButton)findViewById(R.id.toggleDrawingPointsVisibility);
-        if (this.drawingPointsLayer.isVisible()){
+        if (this.drawingPointLayer.isVisible()){
             btn.setBackgroundResource(R.drawable.path_visible);
         } else {
             btn.setBackgroundResource(R.drawable.path_invisible);
         }
 
         btn = (ImageButton)findViewById(R.id.toggleMappedPointsVisibility);
-        if (this.mappedPointsLayer.isVisible()){
+        if (this.mappedPointLayer.isVisible()){
             btn.setBackgroundResource(R.drawable.path_visible);
         } else {
             btn.setBackgroundResource(R.drawable.path_invisible);
@@ -246,35 +227,57 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         }
     }
 
-    private void updateLowerListSection(){
-        LinearLayout ll = (LinearLayout)findViewById(R.id.lowerListSection);
-        if (isLowerListVisible){
-            ll.setVisibility(View.VISIBLE);
-        } else {
-            ll.setVisibility(View.GONE);
-        }
-    }
+
 
     private void updateGeoLocationsText(){
         TextView tw = (TextView)findViewById(R.id.lowerText);
         if (isShowingMappedPoints){
-            tw.setText(String.format("MP:%d high:%s MapId:%d", this.mappedPointsLayer.getPoints().size(), this.mappedPointsLayer.getHighlightedPoints().size(), this.navigationContext.getSchemaMapId()));
+            tw.setText(String.format("MP:%d high:%s MapId:%d", this.mappedPointManager.getPoints().size(), this.mappedPointManager.getHighlightedPoints().size(), this.navigationContext.getSchemaMapId()));
         } else {
-            tw.setText(String.format("points:%d high:%s MapId:%d", this.drawingPointsLayer.getPoints().size(), this.drawingPointsLayer.getHighlightedPoints().size(), this.navigationContext.getSchemaMapId()));
+            tw.setText(String.format("points:%d high:%s MapId:%d", this.drawingPointManager.getPoints().size(), this.drawingPointManager.getHighlightedPoints().size(), this.navigationContext.getSchemaMapId()));
         }
 
     }
 
-    private void rebindListOfPoints(){
-        ListView lowerList = (ListView)findViewById(R.id.lowerList);
+
+
+
+
+
+
+    /* setting modes */
+    private void setIsLowerListVisible(boolean visible){
+        this.isLowerListVisible = visible;
+        if (isLowerListVisible){
+            this.lowerList.setVisibility(View.VISIBLE);
+        } else {
+            this.lowerList.setVisibility(View.GONE);
+        }
+        updateGeoLocationsText();
+        updateButtons();
+    }
+
+    private void setIsShowingMappedPoints(boolean visible){
+        this.isShowingMappedPoints = visible;
         if (isShowingMappedPoints){
-            this.mappedPointAdapter = new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, this.mappedPoints);
-            lowerList.setAdapter(this.mappedPointAdapter);
+            this.lowerList.setAdapter(this.mappedPointAdapter);
         } else {
-            this.layerPointAdapter = new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, this.drawingPoints);
-            lowerList.setAdapter(this.layerPointAdapter);
+            this.lowerList.setAdapter(this.drawingPointAdapter);
         }
+        updateGeoLocationsText();
+        updateButtons();
     }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -282,27 +285,31 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
     /* On click buttons */
     public void onToggleDrawingModeClick(View view) {
-        // business operation
         this.drawingScreenView.setDrawingMode(!this.drawingScreenView.isDrawingMode());
+
         updateButtons();
+        updateGeoLocationsText();
     }
 
     public void onToggleLowerListSectionVisibilityClick(View view) {
-        this.isLowerListVisible = !this.isLowerListVisible;
-        updateLowerListSection();
+        setIsLowerListVisible(!this.isLowerListVisible);
+
         updateButtons();
+        updateGeoLocationsText();
     }
 
     public void onToggleDrawingPointsVisibilityClick(View view) {
-        // business operation
-        this.drawingPointsLayer.setVisibility(!this.drawingPointsLayer.isVisible());
+        this.drawingPointLayer.setVisibility(!this.drawingPointLayer.isVisible());
+
         updateButtons();
+        updateGeoLocationsText();
     }
 
     public void onToggleMappedPointsVisibilityClick(View view) {
-        // business operation
-        this.mappedPointsLayer.setVisibility(!this.mappedPointsLayer.isVisible());
+        this.mappedPointLayer.setVisibility(!this.mappedPointLayer.isVisible());
+
         updateButtons();
+        updateGeoLocationsText();
     }
 
     public void onGeoLocationsMapClick(View view) {
@@ -317,19 +324,15 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         startActivity(intent);
     }
 
-    public void onDeleteAllDrawingPointsClick(View view) {
-        if (isShowingMappedPoints){
-            this.mappedPointsLayer.removeAllPoints();
-            this.mappedPointsPersistence.deleteAllPoints(this.navigationContext.getSchemaMapId());
-            this.mappedPointAdapter.clear();
+    public void onDeleteAllPointsClick(View view) {
+        if (this.isShowingMappedPoints){
+            this.mappedPointManager.removeAllPoints();
         } else {
-            this.drawingPointsLayer.removeAllPoints();
-            this.drawingPointPersistence.deleteAllPoints(this.navigationContext.getSchemaMapId());
-            this.layerPointAdapter.clear();
+            this.drawingPointManager.removeAllPoints();
         }
 
-
         updateGeoLocationsText();
+        updateButtons();
     }
 
     public void onSchemaMapListClick(View view) {
@@ -346,19 +349,23 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         startActivity(intent);
     }
 
-    public void onDeleteAllMappedPointsClick(View view) {
-
-    }
-
 
     public void onToggleDrawingMappedPointClick(View view) {
-        this.isShowingMappedPoints = !isShowingMappedPoints;
-        updateLowerListSection();
-        updateGeoLocationsText();
+        this.setIsShowingMappedPoints(!this.isShowingMappedPoints);
 
+        updateGeoLocationsText();
         updateButtons();
-        rebindListOfPoints();
     }
+
+
+
+
+
+
+
+
+
+
 
     public void onRefreshPositionClick(View view) {
         /*
@@ -440,86 +447,30 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
     /* List click */
     public void onSimpleDeleteListItemClick(View view) {
-        LayerPoint itemToRemove = (LayerPoint)view.getTag();
-
+        Object itemToRemove = view.getTag();
         if (isShowingMappedPoints){
-            this.mappedPointsLayer.removePoint(itemToRemove);
-            this.mappedPointsPersistence.deleteMappedPoint(itemToRemove.relatedMappedPoint);
-            this.mappedPointAdapter.remove(itemToRemove);
-
-
-
+            this.drawingPointManager.removePoint((DrawingPoint)itemToRemove);
         } else {
-
-            this.drawingPointsLayer.removePoint(itemToRemove);
-            this.drawingPointPersistence.deleteDrawingPoint(itemToRemove.relatedDrawingPoint);
-            this.layerPointAdapter.remove(itemToRemove);
-
+            this.mappedPointManager.removePoint((MappedPoint)itemToRemove);
         }
-
 
         updateGeoLocationsText();
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        LayerPoint itemClicked = (LayerPoint)parent.getItemAtPosition(position);
-
+        Object itemClicked = parent.getItemAtPosition(position);
         if (isShowingMappedPoints){
-            this.mappedPointsLayer.highlightPoint(itemClicked);
-            this.mappedPointAdapter.notifyDataSetChanged();
+            this.drawingPointManager.toggleHighlightPoint((DrawingPoint)itemClicked);
         } else {
-            // this shows clicked location and hides the last clicked one
-            this.drawingPointsLayer.highlightPoint(itemClicked);
-            this.layerPointAdapter.notifyDataSetChanged();
+            this.mappedPointManager.toggleHighlightPoint((MappedPoint)itemClicked);
         }
-
-
-
         updateGeoLocationsText();
     }
 
 
 
 
-
-
-
-
-
-
-
-
-
-    /*callback from Image drawing view*/
-
-    @Override
-    public DrawingPoint addDrawingPoint(float vX, float vY) {
-        LayerPoint lp = this.drawingPointsLayer.addPoint(vX, vY);
-
-        if (lp != null) {
-            this.drawingPointPersistence.addPoint(this.navigationContext.getSchemaMapId(), lp.relatedDrawingPoint);
-            this.layerPointAdapter.add(lp);
-        }
-
-        updateGeoLocationsText();
-
-        if (lp!=null) {
-            return lp.relatedDrawingPoint;
-        }
-
-        return null;
-    }
-
-    @Override
-    public DrawingPoint removeLastDrawingPoint() {
-        LayerPoint lp = this.drawingPointsLayer.removeLastPoint();
-        this.drawingPointPersistence.deleteDrawingPoint(lp.relatedDrawingPoint);
-        this.layerPointAdapter.remove(lp);
-
-        updateGeoLocationsText();
-        return lp.relatedDrawingPoint;
-    }
 
 
 }

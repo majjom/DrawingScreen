@@ -120,9 +120,9 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/deleteAllDrawingPoints"
+                android:id="@+id/deleteAllPoints"
                 android:background="@drawable/delete_saved_data"
-                android:onClick="onDeleteAllDrawingPointsClick"
+                android:onClick="onDeleteAllPointsClick"
                 />
 
             <ImageButton

@@ -18,19 +18,13 @@ import java.util.List;
  */
 public class DistanceCalculator {
 
-    public static void sortToDistance(Location location, List<LayerPoint> points) {
-        for (LayerPoint point : points){
-            // TODO
-            //point.distanceToLocation = gps2m(point.)
-        }
-
-    }
-
-    public static List<DistancePoint> sortToDistance(LatLng location, List<LatLng> points) {
+    public static List<DistancePoint> sortToDistance(Location location, List<MappedPoint> points) {
         List<DistancePoint> result = new ArrayList<>();
-        for (LatLng point : points){
-            result.add(new DistancePoint(point, getDistance(location, point)));
+
+        for (MappedPoint point : points){
+            result.add(new DistancePoint(point, getDistance(point, location)));
         }
+
         Collections.sort(result, new Comparator<DistancePoint>() {
             @Override
             public int compare(DistancePoint lhs, DistancePoint rhs) {
@@ -49,11 +43,9 @@ public class DistanceCalculator {
     }
 
 
-    public static double getDistance(LatLng a, LatLng b) {
-        return gps2m(a.latitude, a.longitude, b.latitude, b.longitude);
+    public static double getDistance(MappedPoint a, Location b) {
+        return gps2m(a.geoLocation.latitude, a.geoLocation.longitude, b.getLatitude(), b.getLongitude());
     }
-
-
 
     private static double gps2m(double lat_a, double lng_a, double lat_b, double lng_b) {
         double pk = (float) (180/3.14169);

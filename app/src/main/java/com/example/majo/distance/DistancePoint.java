@@ -1,14 +1,15 @@
 package com.example.majo.distance;
 
+import com.example.majo.BusinessObjects.MappedPoint;
 import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by majo on 20-Jan-15.
  */
 public class DistancePoint {
-    public LatLng point;
+    public MappedPoint point;
     public double distance;
-    public DistancePoint(LatLng point, double distance){
+    public DistancePoint(MappedPoint point, double distance){
         this.point = point;
         this.distance = distance;
     }

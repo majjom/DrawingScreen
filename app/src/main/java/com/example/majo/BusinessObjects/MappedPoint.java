@@ -16,6 +16,9 @@ public class MappedPoint extends PersistedObject {
         this.order = -1;
     }
 
+    // not stored in DB
+    public boolean isHighlighted = false;
+
     @Override
     public String toString() {
         return String.format("MPid:%s dp:%s mp:%s", String.valueOf(this.id), this.drawingPoint.toString(), this.geoLocation.toString());
