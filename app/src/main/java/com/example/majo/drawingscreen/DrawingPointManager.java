@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by majo on 20-Jan-15.
  */
-public class DrawingPointManager implements IDrawingPointManager, IOnPointListener {
+public class DrawingPointManager implements IPointManager<DrawingPoint>, IOnPointListener {
 
     IPointLayer drawingLayer;
     SimpleDeleteListAdapter<DrawingPoint> listAdapter;
@@ -296,16 +296,20 @@ public class DrawingPointManager implements IDrawingPointManager, IOnPointListen
     /******** IOnPointListener ***************/
 
     public void highlightDrawingPoint(float vX, float vY){
+        if (!this.drawingLayer.isVisible()) return;
         this.toggleHighlightPoint(vX, vY);
     }
 
     @Override
     public DrawingPoint addDrawingPoint(float vX, float vY) {
+        if (!this.drawingLayer.isVisible()) return null;
         return this.addPoint(vX, vY);
     }
 
     @Override
     public DrawingPoint removeLastDrawingPoint() {
+        if (!this.drawingLayer.isVisible()) return null;
         return this.removeLastPoint();
     }
+
 }

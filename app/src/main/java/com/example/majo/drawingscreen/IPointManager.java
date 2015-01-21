@@ -7,27 +7,27 @@ import java.util.List;
 /**
  * Created by majo on 20-Jan-15.
  */
-public interface IDrawingPointManager {
+public interface IPointManager<T> {
 
     // data
     int getSchemaMapId();
 
     void refreshPointsFromDb();
 
-    List<DrawingPoint> getPoints();
+    List<T> getPoints();
 
     int getRadius();
     void setRadius(int radius);
-    DrawingPoint addPoint(float x, float y);
+    T addPoint(float x, float y);
 
-    void removePoint(DrawingPoint point);
-    void removePoints(List<DrawingPoint> points);
-    DrawingPoint removeLastPoint();
+    void removePoint(T point);
+    void removePoints(List<T> points);
+    T removeLastPoint();
     void removeAllPoints();
 
     // highlighting
-    List<DrawingPoint> getHighlightedPoints();
-    void toggleHighlightPoint(DrawingPoint point);
+    List<T> getHighlightedPoints();
+    void toggleHighlightPoint(T point);
     void toggleHighlightPoint(float x, float y);
     void clearHighlight();
 

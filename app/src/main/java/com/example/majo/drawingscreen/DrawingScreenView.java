@@ -40,8 +40,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
     private DrawingMode drawingMode;
 
 
-    IOnPointListener onPointListener;
-
+    List<IOnPointListener> onPointListeners;
     List<IBitmapLayer> layers;
 
 
@@ -72,7 +71,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
         this.layers = new ArrayList<>();
 
-        this.onPointListener = null;
+        this.onPointListeners = new ArrayList<>();
 
         this.drawingMode = DrawingMode.ZOOM;
     }
@@ -208,23 +207,27 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
     /*inform all onPointListeners*/
     private void addDrawingPoint(float vX, float vY){
-        if (this.onPointListener != null){
+        if (this.onPointListeners.size() > 0){
             PointF viewPoint = new PointF(vX, vY);
             if (this.drawingMode == DrawingMode.DRAW) {
-                this.onPointListener.addDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+                for(IOnPointListener listener : this.onPointListeners){
+                    listener.addDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+                }
             } else if (this.drawingMode == DrawingMode.HIGHLIGHT){
-                this.onPointListener.highlightDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+                for(IOnPointListener listener : this.onPointListeners) {
+                    listener.highlightDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+                }
             }
         }
     }
 
     private void removeLastDrawingPoint(){
-        if (this.onPointListener != null){
-            this.onPointListener.removeLastDrawingPoint();
+        if (this.onPointListeners.size() > 0){
+            for(IOnPointListener listener : this.onPointListeners){
+                listener.removeLastDrawingPoint();
+            }
         }
     }
-
-
 
 
 
@@ -347,8 +350,8 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
 
-    public void setPointListener(IOnPointListener listener){
-        this.onPointListener = listener;
+    public void addPointListener(IOnPointListener listener){
+        this.onPointListeners.add(listener);
     }
 
 

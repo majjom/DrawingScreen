@@ -12,5 +12,5 @@ public interface IDrawingScreenView {
 
     void addLayer(IBitmapLayer layer);
 
-    void setPointListener(IOnPointListener listener);
+    void addPointListener(IOnPointListener listener);
 }

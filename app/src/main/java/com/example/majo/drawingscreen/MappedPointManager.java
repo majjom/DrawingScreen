@@ -15,19 +15,20 @@ import java.util.List;
 /**
  * Created by moravekm on 21-Jan-15.
  */
-public class MappedPointManager implements IMappedPointManager {
+public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointListener {
 
     IPointLayer drawingLayer;
     SimpleDeleteListAdapter<MappedPoint> listAdapter;
     IMappedPointsPersistence persistence;
     int schemaMapId;
+    IOnPointChanged onPointChanged;
 
     List<MappedPoint> points;
 
     int highlightColor;
     int color;
 
-    public MappedPointManager(IPointLayer drawingLayer, SimpleDeleteListAdapter<MappedPoint> listAdapter, IMappedPointsPersistence persistence, int schemaMapId){
+    public MappedPointManager(IPointLayer drawingLayer, SimpleDeleteListAdapter<MappedPoint> listAdapter, IMappedPointsPersistence persistence, IOnPointChanged onPointChanged, int schemaMapId){
         this.drawingLayer = drawingLayer;
         this.listAdapter = listAdapter;
         this.persistence = persistence;
@@ -37,11 +38,8 @@ public class MappedPointManager implements IMappedPointManager {
 
         this.color = Color.BLUE;
         this.highlightColor = Color.RED;
-    }
 
-    @Override
-    public int getSchemaMapId() {
-        return this.schemaMapId;
+        this.onPointChanged = onPointChanged;
     }
 
     @Override
@@ -56,11 +54,33 @@ public class MappedPointManager implements IMappedPointManager {
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
+    }
+
+    @Override
+    public int getSchemaMapId() {
+        return this.schemaMapId;
     }
 
     @Override
     public List<MappedPoint> getPoints() {
         return this.points;
+    }
+
+    @Override
+    public int getRadius() {
+        return 0;
+    }
+
+    @Override
+    public void setRadius(int radius){
+    }
+
+    @Override
+    public MappedPoint addPoint(float x, float y) {
+        return null;
     }
 
     @Override
@@ -77,6 +97,17 @@ public class MappedPointManager implements IMappedPointManager {
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
+    }
+
+    public void removePoints(List<MappedPoint> points){
+    }
+
+    @Override
+    public MappedPoint removeLastPoint(){
+        return null;
     }
 
     @Override
@@ -92,7 +123,13 @@ public class MappedPointManager implements IMappedPointManager {
 
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
+
+
+
 
     @Override
     public List<MappedPoint> getHighlightedPoints() {
@@ -108,10 +145,14 @@ public class MappedPointManager implements IMappedPointManager {
 
     @Override
     public void toggleHighlightPoint(MappedPoint point) {
+        this.setHighlightPoint(point, !point.isHighlighted);
+    }
+
+    private void setHighlightPoint(MappedPoint point, boolean isHighlighted) {
         // 1) store in local list
         int pointIdx = this.points.indexOf(point);
         if (pointIdx == -1) return;
-        this.points.get(pointIdx).isHighlighted = !this.points.get(pointIdx).isHighlighted;
+        this.points.get(pointIdx).isHighlighted = isHighlighted;
 
         // 2) store in DB
         // NOPE
@@ -124,16 +165,21 @@ public class MappedPointManager implements IMappedPointManager {
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.getHighlightedPoints()), this.highlightColor);
 
+        // 05) notify
+        this.onPointChanged.onPointChanged();
     }
 
     @Override
     public void toggleHighlightPoint(float x, float y) {
         for (MappedPoint point : this.points){
-            if ((int)point.drawingPoint.x == (int)x && (int)point.drawingPoint.y == (int)y){
-                toggleHighlightPoint(point);
+            if (isPointInCircle(point.drawingPoint.x, point.drawingPoint.y, point.drawingPoint.radius, x, y)){
+                setHighlightPoint(point, true);
             }
         }
+    }
 
+    private boolean isPointInCircle(double centerX, double centerY, double radius, double x, double y){
+        return  Math.pow(x-centerX, 2) + Math.pow(y-centerY, 2) <= radius*radius;
     }
 
     @Override
@@ -152,6 +198,10 @@ public class MappedPointManager implements IMappedPointManager {
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
+
+        // 05) notify
+        this.onPointChanged.onPointChanged();
+
     }
 
     @Override
@@ -173,6 +223,33 @@ public class MappedPointManager implements IMappedPointManager {
     public int getColor() {
         return this.color;
     }
+
+
+
+
+
+
+    /******** IOnPointListener ***************/
+
+    public void highlightDrawingPoint(float vX, float vY){
+        if (!this.drawingLayer.isVisible()) return;
+        this.toggleHighlightPoint(vX, vY);
+    }
+
+    @Override
+    public DrawingPoint addDrawingPoint(float vX, float vY) {
+        if (!this.drawingLayer.isVisible()) return null;
+        return null;
+    }
+
+    @Override
+    public DrawingPoint removeLastDrawingPoint() {
+        if (!this.drawingLayer.isVisible()) return null;
+        return null;
+    }
+
+
+
 
 
 

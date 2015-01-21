@@ -9,6 +9,7 @@ import java.util.List;
  */
 public interface IPointLayer {
 
+    boolean isVisible();
     void drawPoints(List<DrawingPoint> points, int color);
     void addPoint(DrawingPoint point, int color);
     void clear();

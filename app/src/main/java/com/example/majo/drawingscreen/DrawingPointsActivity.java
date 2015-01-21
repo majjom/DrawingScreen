@@ -97,14 +97,14 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         this.drawingPointManager = new DrawingPointManager(this.drawingPointLayer, this.drawingPointAdapter, new DrawingPointPersistence(this.db), this, this.navigationContext.getSchemaMapId());
         this.drawingPointManager.setColor(Color.BLUE);
         this.drawingPointManager.setHighlightColor(Color.RED);
-        this.drawingPointManager.setRadius(10);;
+        this.drawingPointManager.setRadius(10);
 
 
 
         // connecting DP -------------------------------
         this.lowerList.setAdapter(this.drawingPointAdapter);
         this.drawingScreenView.addLayer(this.drawingPointLayer);
-        this.drawingScreenView.setPointListener(this.drawingPointManager);
+        this.drawingScreenView.addPointListener(this.drawingPointManager);
 
 
         // setup MP -------------------------------
@@ -114,12 +114,13 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         List<MappedPoint> emptyMappedPointList = new ArrayList<>();
         this.mappedPointAdapter = new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, emptyMappedPointList); // first empty
 
-        this.mappedPointManager = new MappedPointManager(this.mappedPointLayer, this.mappedPointAdapter, new MappedPointsPersistence(this.db), this.navigationContext.getSchemaMapId());
+        this.mappedPointManager = new MappedPointManager(this.mappedPointLayer, this.mappedPointAdapter, new MappedPointsPersistence(this.db), this, this.navigationContext.getSchemaMapId());
         this.mappedPointManager.setColor(Color.GREEN);
-        this.mappedPointManager.setHighlightColor(Color.CYAN);
+        this.mappedPointManager.setHighlightColor(Color.MAGENTA);
 
-        // connecting DP -------------------------------
+        // connecting MP -------------------------------
         this.drawingScreenView.addLayer(this.mappedPointLayer);
+        this.drawingScreenView.addPointListener(this.mappedPointManager);
 
 
         // refresh rest of UI
@@ -356,8 +357,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
     public void onDeleteHighLightedPointsClick(View view) {
         if (this.isShowingMappedPoints){
-            // todo
-            //this.mappedPointManager.removePoint();
+            this.mappedPointManager.removePoints(this.mappedPointManager.getHighlightedPoints());
         } else {
             this.drawingPointManager.removePoints(this.drawingPointManager.getHighlightedPoints());
         }
@@ -368,7 +368,6 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
     public void onUndoHighLightedPointsClick(View view) {
         if (this.isShowingMappedPoints){
-            // todo
             this.mappedPointManager.clearHighlight();
         } else {
             this.drawingPointManager.clearHighlight();
@@ -391,7 +390,6 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
         startActivity(intent);
     }
-
 
     public void onToggleDrawingMappedPointClick(View view) {
         this.setIsShowingMappedPoints(!this.isShowingMappedPoints);
@@ -492,9 +490,9 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
     public void onSimpleDeleteListItemClick(View view) {
         Object itemToRemove = view.getTag();
         if (isShowingMappedPoints){
-            this.drawingPointManager.removePoint((DrawingPoint)itemToRemove);
-        } else {
             this.mappedPointManager.removePoint((MappedPoint)itemToRemove);
+        } else {
+            this.drawingPointManager.removePoint((DrawingPoint)itemToRemove);
         }
 
         updateGeoLocationsText();
