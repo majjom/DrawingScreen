@@ -39,7 +39,7 @@ import com.example.majo.persistence.MappedPointsPersistence;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TrackingActivity extends Activity implements LocationListener, IOnPointChanged {
+public class TrackingActivity extends Activity implements LocationListener {
 
     private IDatabaseConnection db;
     private IMappedPointsPersistence mappedPointsPersistence;
@@ -57,7 +57,6 @@ public class TrackingActivity extends Activity implements LocationListener, IOnP
     private DrawingScreenView drawingScreenView;
 
     private Layer mappedPointLayer;
-    private SimpleDeleteListAdapter<MappedPoint> mappedPointAdapter;
     private MappedPointManager mappedPointManager;
 
     @Override
@@ -84,10 +83,7 @@ public class TrackingActivity extends Activity implements LocationListener, IOnP
         this.mappedPointLayer = new Layer(this, this.getAssetName());
         this.mappedPointLayer.setVisibility(false);
 
-        List<MappedPoint> emptyMappedPointList = new ArrayList<>();
-        this.mappedPointAdapter = new SimpleDeleteListAdapter(TrackingActivity.this, R.layout.list_item_simple_delete, emptyMappedPointList); // first empty
-
-        this.mappedPointManager = new MappedPointManager(this.mappedPointLayer, this.mappedPointAdapter, this.mappedPointsPersistence, this, this.navigationContext.getSchemaMapId());
+        this.mappedPointManager = new MappedPointManager(this.mappedPointLayer, this.mappedPointsPersistence, this.navigationContext.getSchemaMapId());
         this.mappedPointManager.setColor(Color.GREEN);
         this.mappedPointManager.setHighlightColor(Color.MAGENTA);
 
@@ -279,20 +275,6 @@ public class TrackingActivity extends Activity implements LocationListener, IOnP
 
 
 
-
-
-
-
-
-
-
-
-
-    // todo put this away
-    @Override
-    public void onPointChanged() {
-
-    }
 
 
 }

@@ -1,6 +1,7 @@
 package com.example.majo.drawingscreen;
 
 import android.graphics.Color;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.example.majo.Adapters.SimpleDeleteListAdapter;
@@ -18,7 +19,7 @@ import java.util.List;
 public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointListener {
 
     IPointLayer drawingLayer;
-    SimpleDeleteListAdapter<MappedPoint> listAdapter;
+    ArrayAdapter<MappedPoint> listAdapter;
     IMappedPointsPersistence persistence;
     int schemaMapId;
     IOnPointChanged onPointChanged;
@@ -28,7 +29,11 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
     int highlightColor;
     int color;
 
-    public MappedPointManager(IPointLayer drawingLayer, SimpleDeleteListAdapter<MappedPoint> listAdapter, IMappedPointsPersistence persistence, IOnPointChanged onPointChanged, int schemaMapId){
+    public MappedPointManager(IPointLayer drawingLayer, IMappedPointsPersistence persistence, int schemaMapId) {
+        this(drawingLayer, null, persistence, null, schemaMapId);
+    }
+
+    public MappedPointManager(IPointLayer drawingLayer, ArrayAdapter<MappedPoint> listAdapter, IMappedPointsPersistence persistence, IOnPointChanged onPointChanged, int schemaMapId){
         this.drawingLayer = drawingLayer;
         this.listAdapter = listAdapter;
         this.persistence = persistence;
@@ -48,15 +53,19 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         this.points = this.persistence.getAllPoints(this.schemaMapId);
 
         // 3) update GUI - list adapter
-        this.listAdapter.clear();
-        this.listAdapter.addAll(this.points);
+        if (this.listAdapter!=null) {
+            this.listAdapter.clear();
+            this.listAdapter.addAll(this.points);
+        }
 
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
 
         // 05) notify
-        this.onPointChanged.onPointChanged();
+        if (this.onPointChanged!=null) {
+            this.onPointChanged.onPointChanged();
+        }
     }
 
     public List<MappedPoint> getPointsFromDatabaseWithoutRefresh(){
@@ -96,14 +105,18 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         this.persistence.deleteMappedPoint(point);
 
         // 3) update GUI - list adapter
-        this.listAdapter.remove(point);
+        if (this.listAdapter!=null) {
+            this.listAdapter.remove(point);
+        }
 
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
 
         // 05) notify
-        this.onPointChanged.onPointChanged();
+        if (this.onPointChanged!=null) {
+            this.onPointChanged.onPointChanged();
+        }
     }
 
     public void removePoints(List<MappedPoint> points){
@@ -113,8 +126,11 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         // 2) store in DB
         for (MappedPoint point : points) {
             this.persistence.deleteMappedPoint(point);
+
             // 3) update GUI - list adapter
-            this.listAdapter.remove(point);
+            if (this.listAdapter!=null) {
+                this.listAdapter.remove(point);
+            }
         }
 
         // 4) update GUI - layer screen
@@ -122,7 +138,9 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
 
         // 05) notify
-        this.onPointChanged.onPointChanged();
+        if (this.onPointChanged!=null) {
+            this.onPointChanged.onPointChanged();
+        }
     }
 
     @Override
@@ -145,13 +163,17 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         this.persistence.deleteAllPoints(this.schemaMapId);
 
         // 3) update GUI - list adapter
-        this.listAdapter.clear();
+        if (this.listAdapter!=null) {
+            this.listAdapter.clear();
+        }
 
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
 
         // 05) notify
-        this.onPointChanged.onPointChanged();
+        if (this.onPointChanged!=null) {
+            this.onPointChanged.onPointChanged();
+        }
     }
 
 
@@ -189,7 +211,9 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         // NOPE
 
         // 3) update GUI - list adapter
-        this.listAdapter.notifyDataSetChanged();
+        if (this.listAdapter!=null) {
+            this.listAdapter.notifyDataSetChanged();
+        }
 
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
@@ -197,7 +221,9 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.getHighlightedPoints()), this.highlightColor);
 
         // 05) notify
-        this.onPointChanged.onPointChanged();
+        if (this.onPointChanged!=null) {
+            this.onPointChanged.onPointChanged();
+        }
     }
 
     @Override
@@ -224,14 +250,18 @@ public class MappedPointManager implements IPointManager<MappedPoint>, IOnPointL
         // NOPE
 
         // 3) update GUI - list adapter
-        this.listAdapter.notifyDataSetChanged();
+        if (this.listAdapter!=null) {
+            this.listAdapter.notifyDataSetChanged();
+        }
 
         // 4) update GUI - layer screen
         this.drawingLayer.clear();
         this.drawingLayer.drawPoints(this.getDrawingPointsOnly(this.points), this.color);
 
         // 05) notify
-        this.onPointChanged.onPointChanged();
+        if (this.onPointChanged!=null) {
+            this.onPointChanged.onPointChanged();
+        }
 
     }
 
