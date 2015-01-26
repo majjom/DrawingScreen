@@ -170,7 +170,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
                         this.geoLocationPersistence.getAllLocations(this.navigationContext.getGeoSessionId()));
                 this.mappedPointsPersistence.addPoints(this.navigationContext.getSchemaMapId(), mappedPointList);
 
-                this.drawingPointPersistence.deleteAllPoints(this.navigationContext.getSchemaMapId());
+                this.drawingPointManager.removeAllPoints();
 
                 Toast.makeText(this, "Created mapped point count:" + String.valueOf(mappedPointList.size()), Toast.LENGTH_SHORT).show();
             } else {
