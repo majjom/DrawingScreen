@@ -15,7 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.majo.Activities.GeoLocationsMapsActivity;
-import com.example.majo.Activities.SchemaMapListActivity;
+import com.example.majo.maps.MapManager;
+import com.example.majo.maps.SchemaMapListActivity;
 import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.Activities.GeoSessionsListActivity;
@@ -91,13 +92,15 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
         // setup common DP + MP -------------------------------
         this.drawingScreenView = (DrawingScreenView)findViewById(R.id.imageView);
-        this.drawingScreenView.setImageAsset(this.getAssetName());
+        //TODO remove this this.drawingScreenView.setImageAsset(this.getAssetName());
+        this.drawingScreenView.setImageFile(MapManager.getBitmapFileNameComplete(this.navigationContext.getSchemaMapId(), this));
 
         this.lowerList = (ListView)findViewById(R.id.lowerList);
         this.lowerList.setOnItemClickListener(this);
 
         // setup DP -------------------------------
-        this.drawingPointLayer = new Layer(this, this.getAssetName());
+        // TODO remove this this.drawingPointLayer = new Layer(this, this.getAssetName());
+        this.drawingPointLayer = new Layer(this, MapManager.getBitmapFileName(this.navigationContext.getSchemaMapId()));
 
         List<DrawingPoint> emptyDrawingPointList = new ArrayList<>();
         this.drawingPointAdapter = new SimpleDeleteListAdapter(DrawingPointsActivity.this, R.layout.list_item_simple_delete, emptyDrawingPointList); // first empty
@@ -116,7 +119,8 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
 
         // setup MP -------------------------------
-        this.mappedPointLayer = new Layer(this, this.getAssetName());
+        // todo remove this this.mappedPointLayer = new Layer(this, this.getAssetName());
+        this.mappedPointLayer = new Layer(this, MapManager.getBitmapFileName(this.navigationContext.getSchemaMapId()));
         this.mappedPointLayer.setVisibility(false);
 
         List<MappedPoint> emptyMappedPointList = new ArrayList<>();
@@ -179,21 +183,6 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         }
     }
 
-
-    // TODO: do this properly
-    private String getAssetName(){
-        String assetName = "melchsee_small.jpg";
-        if (this.navigationContext.getSchemaMapId() % 4 == 1){
-            assetName = "melchsee.jpg";
-        }
-        if (this.navigationContext.getSchemaMapId() % 4 == 2){
-            assetName = "Rigi.jpg";
-        }
-        if (this.navigationContext.getSchemaMapId() % 4 == 3){
-            assetName = "squirrel.jpg";
-        }
-        return assetName;
-    }
 
 
 
@@ -336,11 +325,15 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
     public void onGeoLocationsMapClick(View view) {
         Intent intent = new Intent(this, GeoLocationsMapsActivity.class);
 
+        NavigationContext.setNavigationContext(intent, navigationContext);
+
         startActivity(intent);
     }
 
     public void onGeoSessionsListClick(View view) {
         Intent intent = new Intent(this, GeoSessionsListActivity.class);
+
+        NavigationContext.setNavigationContext(intent, navigationContext);
 
         startActivity(intent);
     }
@@ -378,12 +371,6 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         updateButtons();
     }
 
-    public void onSchemaMapListClick(View view) {
-        Intent intent = new Intent(this, SchemaMapListActivity.class);
-
-        startActivity(intent);
-    }
-
     public void onSelectGeoSessionClick(View view) {
         Intent intent = new Intent(this, GeoSessionsListActivity.class);
 
@@ -419,47 +406,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
 
 
 
-    public void onRefreshPositionClick(View view) {
-        /*
-        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        LayerPoint lp;
-
-        if (loc == null){
-            Toast.makeText(this, "null", Toast.LENGTH_SHORT).show();
-            return;
-        } else {
-
-            MappedPoint mp = this.positionService.getCurrentPosition(loc);
-            if (mp==null){
-                Toast.makeText(this, "positionService.getCurrentPosition NULL", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-
-            lp = getCorresponding(mp, this.mappedPoints);
-            String toastText = loc.toString();
-            if (lp != null){
-                toastText += lp.toString();
-            }
-            Toast.makeText(this, toastText, Toast.LENGTH_SHORT).show();
-        }
-
-
-
-
-        this.mappedPointsLayer.undoHighlight();
-        this.mappedPointsLayer.highlightPoint(lp);
-
-
-        updateLowerListSection();
-        updateGeoLocationsText();
-
-        updateButtons();
-        rebindListOfPoints();
-        */
-    }
 
     private LayerPoint getCorresponding(MappedPoint mp, List<LayerPoint> lpl){
         for (LayerPoint lp : lpl){

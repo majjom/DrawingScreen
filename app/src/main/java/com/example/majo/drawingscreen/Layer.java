@@ -34,7 +34,8 @@ public class Layer implements IPointLayer, IBitmapLayer {
         bitmapOptions.inJustDecodeBounds = true;
 
         try {
-            InputStream str = context.getAssets().open(assetName, AssetManager.ACCESS_RANDOM);
+            //InputStream str = context.getAssets().open(assetName, AssetManager.ACCESS_RANDOM);
+            InputStream str = context.openFileInput(assetName);
 
             BitmapFactory.decodeStream(str, null, bitmapOptions);
             str.close();

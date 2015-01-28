@@ -21,11 +21,6 @@
         <activity
             android:name=".DrawingPointsActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.example.majo.drawingscreenlist.DrawingPointsListActivity"
@@ -58,7 +53,7 @@
             android:label="@string/title_activity_geo_sessions_list" >
         </activity>
         <activity
-            android:name="com.example.majo.Activities.SchemaMapListActivity"
+            android:name="com.example.majo.maps.SchemaMapListActivity"
             android:label="@string/title_activity_schema_map_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

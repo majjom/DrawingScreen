@@ -1,12 +1,18 @@
-package com.example.majo.Activities;
+package com.example.majo.maps;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.example.majo.Adapters.ImageListAdapter;
 import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.SchemaMap;
 import com.example.majo.drawingscreen.DrawingPointsActivity;
@@ -17,7 +23,13 @@ import com.example.majo.persistence.IDatabaseConnection;
 import com.example.majo.persistence.ISchemaMapPersistence;
 import com.example.majo.persistence.SchemaMapPersistence;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.List;
+
 public class SchemaMapListActivity extends ActionBarActivity implements AdapterView.OnItemClickListener {
+
+    private static final int SELECT_PICTURE = 1;
 
     private NavigationContext navigationContext;
 
@@ -25,7 +37,7 @@ public class SchemaMapListActivity extends ActionBarActivity implements AdapterV
     ISchemaMapPersistence persistence;
 
     ListView schemaMapList;
-    SimpleDeleteListAdapter<SchemaMap> schemaMapListAdapter;
+    ImageListAdapter<SchemaMap> schemaMapListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,19 +74,51 @@ public class SchemaMapListActivity extends ActionBarActivity implements AdapterV
         super.onDestroy();
     }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String selectedImagePath;
+        //ADDED
+        String filemanagerstring;
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                Uri selectedImage = data.getData();
+                try {
+                    // create new DB entry
+                    SchemaMap map = new SchemaMap("name");
+                    this.persistence.addMap(map);
+
+                    // store bitmap
+                    InputStream imageStream = getContentResolver().openInputStream(selectedImage);
+                    Bitmap selectedImageBitmap = BitmapFactory.decodeStream(imageStream);
+                    MapManager.storeBitmap(map.id, selectedImageBitmap, this);
+
+                    // refresh stuff
+                    refreshList();
+                } catch (FileNotFoundException e){
+
+                }
+            }
+        }
+    }
+
+
+
+
 
     private void refreshList(){
-        this.schemaMapListAdapter = new SimpleDeleteListAdapter(SchemaMapListActivity.this, R.layout.list_item_simple_delete, this.persistence.getAllMaps());
+        List<SchemaMap> maps = this.persistence.getAllMaps();
+        this.schemaMapListAdapter = new ImageListAdapter<>(SchemaMapListActivity.this, R.layout.list_item_image, maps);
         this.schemaMapList.setAdapter(schemaMapListAdapter);
     }
 
 
 
     /*on CLICK*/
-    public void onSimpleDeleteListItemClick(View view) {
+    public void onImageDeleteItemButtonClick(View view) {
         SchemaMap itemToRemove = (SchemaMap)view.getTag();
         schemaMapListAdapter.remove(itemToRemove);
         this.persistence.deleteMap(itemToRemove);
+        MapManager.deleteBitmap(itemToRemove.id, this);
     }
 
     @Override
@@ -89,9 +133,11 @@ public class SchemaMapListActivity extends ActionBarActivity implements AdapterV
     }
 
     public void onAddSchemaMapClick(View view) {
-        SchemaMap map = new SchemaMap("name");
-        this.persistence.addMap(map);
 
-        refreshList();
+        // pick the image
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
     }
 }

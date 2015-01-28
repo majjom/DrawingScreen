@@ -29,6 +29,7 @@ import com.example.majo.drawingscreen.Layer;
 import com.example.majo.drawingscreen.MappedPointManager;
 import com.example.majo.drawingscreen.R;
 import com.example.majo.helper.NavigationContext;
+import com.example.majo.maps.MapManager;
 import com.example.majo.persistence.DatabaseConnection;
 import com.example.majo.persistence.DrawingPointPersistence;
 import com.example.majo.persistence.IDatabaseConnection;
@@ -77,10 +78,11 @@ public class TrackingActivity extends Activity implements LocationListener {
 
 
         this.drawingScreenView = (DrawingScreenView)findViewById(R.id.imageView);
-        this.drawingScreenView.setImageAsset(this.getAssetName());
+        //this.drawingScreenView.setImageAsset(this.getAssetName());
+        this.drawingScreenView.setImageFile(MapManager.getBitmapFileNameComplete(this.navigationContext.getSchemaMapId(), this));
 
         // setup MP -------------------------------
-        this.mappedPointLayer = new Layer(this, this.getAssetName());
+        this.mappedPointLayer = new Layer(this, MapManager.getBitmapFileName(this.navigationContext.getSchemaMapId()));
         this.mappedPointLayer.setVisibility(false);
 
         this.mappedPointManager = new MappedPointManager(this.mappedPointLayer, this.mappedPointsPersistence, this.navigationContext.getSchemaMapId());
@@ -151,20 +153,6 @@ public class TrackingActivity extends Activity implements LocationListener {
 
 
 
-    // TODO: do this properly
-    private String getAssetName(){
-        String assetName = "melchsee_small.jpg";
-        if (this.navigationContext.getSchemaMapId() % 4 == 1){
-            assetName = "melchsee.jpg";
-        }
-        if (this.navigationContext.getSchemaMapId() % 4 == 2){
-            assetName = "Rigi.jpg";
-        }
-        if (this.navigationContext.getSchemaMapId() % 4 == 3){
-            assetName = "squirrel.jpg";
-        }
-        return assetName;
-    }
 
 
 
