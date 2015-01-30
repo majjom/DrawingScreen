@@ -32,6 +32,8 @@ import com.example.majo.persistence.IMappedPointsPersistence;
 import com.example.majo.persistence.MappedPointsPersistence;
 import com.example.majo.trackingscreen.TrackingActivity;
 
+import junit.framework.TestCase;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -228,6 +230,12 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         } else {
             btn.setBackgroundResource(R.drawable.path_invisible);
         }
+
+        TextView tw = (TextView)findViewById(R.id.pointSizeView);
+        tw.setText(String.valueOf(this.drawingPointManager.getRadius()));
+
+        tw = (TextView)findViewById(R.id.strokeSizeView);
+        tw.setText(String.valueOf(this.drawingScreenView.getStrokeWidth()));
     }
 
 
@@ -395,6 +403,38 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
         startActivity(intent);
     }
 
+    public void onPointSizeViewClick(View view) {
+        int radius = this.drawingPointManager.getRadius();
+
+        if (radius <= 5){
+            radius = 10;
+        } else if (radius <= 10) {
+            radius = 20;
+        } else {
+            radius = 5;
+        }
+
+        this.drawingPointManager.setRadius(radius);
+        TextView tw = (TextView)findViewById(R.id.pointSizeView);
+        tw.setText(String.valueOf(radius));
+    }
+
+    public void onStrokeSizeViewClick(View view) {
+        int strokeWidth = this.drawingScreenView.getStrokeWidth();
+
+        if (strokeWidth <= 5){
+            strokeWidth = 10;
+        } else if (strokeWidth <= 10) {
+            strokeWidth = 20;
+        } else {
+            strokeWidth = 5;
+        }
+
+        this.drawingScreenView.setStrokeWidth(strokeWidth);
+        TextView tw = (TextView)findViewById(R.id.strokeSizeView);
+        tw.setText(String.valueOf(strokeWidth));
+    }
+
 
 
 
@@ -484,6 +524,7 @@ public class DrawingPointsActivity extends Activity implements AdapterView.OnIte
     public void onPointChanged() {
         updateGeoLocationsText();
     }
+
 
 
 }

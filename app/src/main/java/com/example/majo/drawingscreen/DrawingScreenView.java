@@ -36,7 +36,7 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
     /*IDrawingScreenView*/
     private int strokeWidth;
-    private int effectiveStrokeWidth;
+    private int effectiveStrokeWidth; // this is just because of the special drawing mode "highlight"
     private DrawingMode drawingMode;
 
 
@@ -132,8 +132,12 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
      * @param gesture
      * @return returns TRUE if the gesture has been handled by routine and the parent shall not continue
      */
-    private boolean handleOneFingerGesture(float x, float y, FingerGesture gesture){
+    private boolean handleOneFingerGesture(float screenX, float screenY, FingerGesture gesture){
         if (!hasVisibleLayer()) return false;
+
+        PointF translatedBitmapPoint = viewToSourceCoord(screenX, screenY);
+        float x = translatedBitmapPoint.x;
+        float y = translatedBitmapPoint.y;
 
         boolean handledDrawing = false;
         switch (gesture) {
@@ -206,16 +210,15 @@ public class DrawingScreenView extends SubsamplingScaleImageView implements View
 
 
     /*inform all onPointListeners*/
-    private void addDrawingPoint(float vX, float vY){
+    private void addDrawingPoint(float bitmapPointX, float bitmapPointY){
         if (this.onPointListeners.size() > 0){
-            PointF viewPoint = new PointF(vX, vY);
             if (this.drawingMode == DrawingMode.DRAW) {
                 for(IOnPointListener listener : this.onPointListeners){
-                    listener.addDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+                    listener.addDrawingPoint(bitmapPointX, bitmapPointY);
                 }
             } else if (this.drawingMode == DrawingMode.HIGHLIGHT){
                 for(IOnPointListener listener : this.onPointListeners) {
-                    listener.highlightDrawingPoint(viewToSourceCoord(viewPoint).x, viewToSourceCoord(viewPoint).y);
+                    listener.highlightDrawingPoint(bitmapPointX, bitmapPointY);
                 }
             }
         }

@@ -97,7 +97,7 @@ public class CartesianInterpolation {
      * @param points set of points forming a poly line. The poly line defined where the returned point lies.
      * @return Returns Point found or NULL if no such can be found.
      */
-    public static CartesianPoint getNextPoint(CartesianPoint base, int radius, ArrayList<CartesianPoint> points){
+    public static CartesianPoint getNextPoint(CartesianPoint base, double radius, ArrayList<CartesianPoint> points){
         return getNextPointIterative(base, radius, copyToQueue(points));
     }
 
@@ -109,7 +109,7 @@ public class CartesianInterpolation {
      * @param points set of points forming a poly line. The poly line defined where the returned point lies. These points are also shrunk and the queue after run contains all points which were not consumed by the algorithm.
      * @return Returns Point found or NULL if no such can be found.
      */
-    public static CartesianPoint getNextPointIterative(CartesianPoint base, int radius, Queue<CartesianPoint> points){
+    public static CartesianPoint getNextPointIterative(CartesianPoint base, double radius, Queue<CartesianPoint> points){
         // some border cases
         if (base == null) return null;
         if (points == null) return null;
@@ -152,13 +152,13 @@ public class CartesianInterpolation {
         return result;
     }
 
-    private static CartesianPoint intersectionOfLineAndCircleFirst(CartesianPoint linePointA, CartesianPoint linePointB, CartesianPoint circleCentre, int radius){
+    private static CartesianPoint intersectionOfLineAndCircleFirst(CartesianPoint linePointA, CartesianPoint linePointB, CartesianPoint circleCentre, double radius){
         ArrayList<CartesianPoint> result = intersectionOfLineAndNonZeroCenterCircle(linePointA, linePointB, circleCentre, radius);
         if ((result == null) || (result.size() == 0)) return null;
         return result.get(0);
     }
 
-    private static ArrayList<CartesianPoint> intersectionOfLineAndNonZeroCenterCircle(CartesianPoint linePointA, CartesianPoint linePointB, CartesianPoint circleCentre, int radius) {
+    private static ArrayList<CartesianPoint> intersectionOfLineAndNonZeroCenterCircle(CartesianPoint linePointA, CartesianPoint linePointB, CartesianPoint circleCentre, double radius) {
         // the whole thing CircleCentre -> 0,0
         CartesianPoint shiftedA = new CartesianPoint(linePointA.x - circleCentre.x, linePointA.y - circleCentre.y) ;
         CartesianPoint shiftedB = new CartesianPoint(linePointB.x - circleCentre.x, linePointB.y - circleCentre.y) ;
@@ -182,7 +182,7 @@ public class CartesianInterpolation {
      * @param radius
      * @return Returns 0,1,2 results
      */
-    private static ArrayList<CartesianPoint> intersectionOfLineAndCircle(CartesianPoint linePointA, CartesianPoint linePointB, int radius){
+    private static ArrayList<CartesianPoint> intersectionOfLineAndCircle(CartesianPoint linePointA, CartesianPoint linePointB, double radius){
         ArrayList<CartesianPoint> result = new ArrayList<>();
         if ((linePointA.x == linePointB.x) && (linePointA.y == linePointB.y)) return result; // special case, where the line is not correctly defined
 
@@ -198,12 +198,12 @@ public class CartesianInterpolation {
             double rightUpperY = Math.abs(dy) * Math.sqrt(discriminant);
 
             CartesianPoint result01 = new CartesianPoint();
-            result01.x = (int) Math.round((D * dy + rightUpperX) / (dr * dr));
-            result01.y = (int) Math.round((-1 * D * dx + rightUpperY) / (dr * dr));
+            result01.x = (D * dy + rightUpperX) / (dr * dr);
+            result01.y = (-1 * D * dx + rightUpperY) / (dr * dr);
 
             CartesianPoint result02 = new CartesianPoint();
-            result02.x = (int) Math.round((D * dy - rightUpperX) / (dr * dr));
-            result02.y = (int) Math.round((-1 * D * dx - rightUpperY) / (dr * dr));
+            result02.x = (D * dy - rightUpperX) / (dr * dr);
+            result02.y = (-1 * D * dx - rightUpperY) / (dr * dr);
 
             if (discriminant > 0) {
                 if (liesPointInABLineSegment(result01, linePointA, linePointB)) {
@@ -225,25 +225,25 @@ public class CartesianInterpolation {
         return result;
     }
 
-    private static double get_dx(CartesianPoint linePointA, CartesianPoint linePointB, int radius) {
+    private static double get_dx(CartesianPoint linePointA, CartesianPoint linePointB, double radius) {
         return linePointB.x - linePointA.x;
     }
 
-    private static double get_dy(CartesianPoint linePointA, CartesianPoint linePointB, int radius) {
+    private static double get_dy(CartesianPoint linePointA, CartesianPoint linePointB, double radius) {
         return linePointB.y - linePointA.y;
     }
 
-    private static double get_dr(CartesianPoint linePointA, CartesianPoint linePointB, int radius) {
+    private static double get_dr(CartesianPoint linePointA, CartesianPoint linePointB, double radius) {
         double dx = get_dx(linePointA, linePointB, radius);
         double dy = get_dy(linePointA, linePointB, radius);
         return Math.sqrt(dx*dx + dy*dy);
     }
 
-    private static double get_D(CartesianPoint linePointA, CartesianPoint linePointB, int radius) {
+    private static double get_D(CartesianPoint linePointA, CartesianPoint linePointB, double radius) {
         return linePointA.x*linePointB.y - linePointB.x * linePointA.y;
     }
 
-    private static double get_Discriminant(CartesianPoint linePointA, CartesianPoint linePointB, int radius) {
+    private static double get_Discriminant(CartesianPoint linePointA, CartesianPoint linePointB, double radius) {
         double dr = get_dr(linePointA, linePointB, radius);
         double D = get_D(linePointA, linePointB, radius);
         return radius * radius * dr * dr - (D * D);
@@ -266,7 +266,12 @@ public class CartesianInterpolation {
         // general case
         double t2 = (point.y - linePointA.y) / (linePointB.y - linePointA.y);
         double t1 = (point.x - linePointA.x) / (linePointB.x - linePointA.x);
-        result = t1 == t2 && t1 >= 0 && t1 <= 1;
+
+        // rounding is a must, because sometimes the results differ slightly
+        double roundedT1 = Math.floor(t1 * 10000) / 10000;
+        double roundedT2 = Math.floor(t2 * 10000) / 10000;
+
+        result = roundedT1 == roundedT2 && t1 >= 0 && t1 <= 1;
         return result;
     }
 
@@ -290,6 +295,6 @@ public class CartesianInterpolation {
 
     private static double getDistance(CartesianPoint point1, CartesianPoint point2){
         if ((point1 == null) || (point2 == null)) return 0;
-        return (int)Math.abs(Math.round(Math.sqrt(Math.pow((point2.x - point1.x), 2) + Math.pow((point2.y - point1.y), 2))));
+        return Math.abs(Math.sqrt(Math.pow((point2.x - point1.x), 2) + Math.pow((point2.y - point1.y), 2)));
     }
 }

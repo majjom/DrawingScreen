@@ -66,6 +66,15 @@
             android:onClick="onSelectGeoSessionClick"
             />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="10"
+            android:clickable="true"
+            android:onClick="onPointSizeViewClick"
+            android:id="@+id/pointSizeView" />
+
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,6 +82,16 @@
             android:background="@drawable/abc_btn_radio_to_on_mtrl_015"
             android:onClick="onStartTrackingClick"
             />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="10"
+            android:clickable="true"
+            android:onClick="onStrokeSizeViewClick"
+            android:id="@+id/strokeSizeView" />
+
     </LinearLayout>
 
 
