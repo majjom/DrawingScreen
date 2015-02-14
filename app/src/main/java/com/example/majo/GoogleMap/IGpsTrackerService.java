@@ -2,8 +2,6 @@ package com.example.majo.GoogleMap;
 
 import android.location.Location;
 
-import com.example.majo.persistence.IGeoLocationPersistence;
-
 import java.util.List;
 
 /**

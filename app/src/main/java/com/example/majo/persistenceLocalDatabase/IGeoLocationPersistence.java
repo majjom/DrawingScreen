@@ -1,9 +1,7 @@
-package com.example.majo.persistence;
+package com.example.majo.persistenceLocalDatabase;
 
 import com.example.majo.BusinessObjects.GeoLocation;
-import com.example.majo.BusinessObjects.MappedPoint;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

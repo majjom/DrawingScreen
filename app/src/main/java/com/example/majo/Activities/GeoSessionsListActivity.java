@@ -13,10 +13,10 @@ import com.example.majo.GoogleMap.GpsTrackerServiceHelper;
 import com.example.majo.GoogleMap.IGpsTrackerService;
 import com.example.majo.helper.NavigationContext;
 import com.example.majo.drawingscreen.R;
-import com.example.majo.persistence.DatabaseConnection;
-import com.example.majo.persistence.GeoSessionPersistence;
-import com.example.majo.persistence.IDatabaseConnection;
-import com.example.majo.persistence.IGeoSessionPersistence;
+import com.example.majo.persistenceLocalDatabase.DatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.GeoSessionPersistence;
+import com.example.majo.persistenceLocalDatabase.IDatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.IGeoSessionPersistence;
 
 import java.util.List;
 

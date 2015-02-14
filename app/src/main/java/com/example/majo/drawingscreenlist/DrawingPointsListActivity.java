@@ -8,10 +8,10 @@ import android.widget.ListView;
 import com.example.majo.Adapters.DrawingPointsAdapter;
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.drawingscreen.R;
-import com.example.majo.persistence.DatabaseConnection;
-import com.example.majo.persistence.DrawingPointPersistence;
-import com.example.majo.persistence.IDatabaseConnection;
-import com.example.majo.persistence.IDrawingPointPersistence;
+import com.example.majo.persistenceLocalDatabase.DatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.DrawingPointPersistence;
+import com.example.majo.persistenceLocalDatabase.IDatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.IDrawingPointPersistence;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.LinearLayoutManager;

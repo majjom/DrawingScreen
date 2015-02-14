@@ -3,6 +3,7 @@ package com.example.majo.myapplication.backend;
 import com.google.appengine.api.datastore.Blob;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 
 import java.util.Date;
 import java.util.List;
@@ -15,46 +16,18 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 
 @Entity
 public class SchemaMapEntity {
+    public static final String PROPERTY_NAME = "name";
+
+
     @Id
-    private Long id;
-    private String name;
-    private Date dateCreated;
-
-    public byte[] getThumbnailImage() {
-        return thumbnailImage;
-    }
-
-    private byte[] thumbnailImage;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void clearId() {
-        this.id = null;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Date getDateCreated() {
-        return dateCreated;
-    }
+    public Long id;
+    @Index
+    public String name;
+    public Date dateCreated;
+    public byte[] thumbnailImage;
+    public int version;
 
     public SchemaMapEntity(){
         super();
-    }
-
-    public SchemaMapEntity(String name, Date dateCreated, byte[] thumbnailImage){
-        this(null, name, dateCreated, thumbnailImage);
-    }
-
-    public SchemaMapEntity(Long id, String name, Date dateCreated, byte[] thumbnailImage){
-        super();
-        this.id = id;
-        this.name = name;
-        this.dateCreated = dateCreated;
-        this.thumbnailImage = thumbnailImage;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.majo.persistence;
+package com.example.majo.persistenceLocalDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

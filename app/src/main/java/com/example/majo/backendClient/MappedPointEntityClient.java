@@ -1,8 +1,13 @@
 package com.example.majo.backendClient;
 
-
-import com.example.majo.myapplication.backend.schemaMapStorageApi.SchemaMapStorageApi;
-import com.example.majo.myapplication.backend.schemaMapStorageApi.model.SchemaMapDto;
+import com.example.majo.BusinessObjects.MappedPoint;
+import com.example.majo.BusinessObjects.SchemaMap;
+import com.example.majo.myapplication.backend.mappedPointEntityApi.MappedPointEntityApi;
+import com.example.majo.myapplication.backend.mappedPointEntityApi.model.MappedPointDto;
+import com.example.majo.myapplication.backend.mappedPointEntityApi.model.MappedPointEntity;
+import com.example.majo.myapplication.backend.schemaMapEntityApi.SchemaMapEntityApi;
+import com.example.majo.myapplication.backend.schemaMapEntityApi.model.SchemaMapDto;
+import com.example.majo.myapplication.backend.schemaMapEntityApi.model.SchemaMapEntity;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
@@ -12,15 +17,15 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by majo on 03-Feb-15.
+ * Created by majo on 14-Feb-15.
  */
-public class SchemaMapStorageClient {
+public class MappedPointEntityClient {
 
-    private static SchemaMapStorageApi myApiService = null;
+    private static MappedPointEntityApi myApiService = null;
 
-    public SchemaMapStorageClient(boolean isLocal){
+    public MappedPointEntityClient(boolean isLocal){
         if(myApiService == null) {  // Only do this once
-            SchemaMapStorageApi.Builder builder = new SchemaMapStorageApi.Builder(AndroidHttp.newCompatibleTransport(),
+            MappedPointEntityApi.Builder builder = new MappedPointEntityApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null);
 
             if (isLocal){
@@ -40,41 +45,30 @@ public class SchemaMapStorageClient {
         }
     }
 
-
-    public List<SchemaMapDto> getByName(String name) {
+    public List<MappedPointDto> getAllByMapId(Long mapId) {
         try {
-            return this.myApiService.getByName(name).execute().getItems();
+            return this.myApiService.getAllByMapId(mapId).execute().getItems();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public SchemaMapDto getById(Long id) {
+    public MappedPointDto save(MappedPointDto mappedPointDto) {
         try {
-            return this.myApiService.getById(id).execute();
+            return this.myApiService.save(mappedPointDto).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-
-    public SchemaMapDto save(SchemaMapDto schemaMap) {
+    public void deleteAllForMapId(Long mapId){
         try {
-            return this.myApiService.save(schemaMap).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    public void remove(Long id) {
-        try {
-            this.myApiService.remove(id).execute();
+            this.myApiService.deleteAllForMapId(mapId).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }

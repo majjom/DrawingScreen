@@ -9,12 +9,11 @@ import android.widget.ListView;
 
 import com.example.majo.BusinessObjects.GeoLocation;
 import com.example.majo.drawingscreen.R;
-import com.example.majo.persistence.DatabaseConnection;
-import com.example.majo.persistence.GeoLocationPersistence;
-import com.example.majo.persistence.IDatabaseConnection;
-import com.example.majo.persistence.IGeoLocationPersistence;
+import com.example.majo.persistenceLocalDatabase.DatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.GeoLocationPersistence;
+import com.example.majo.persistenceLocalDatabase.IDatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.IGeoLocationPersistence;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

@@ -4,11 +4,10 @@ package com.example.majo.BusinessObjects;
  * Created by moravekm on 19-Dec-14.
  */
 
-import com.example.majo.persistence.IDrawingPointPersistence;
-import com.example.majo.persistence.IGeoSessionPersistence;
-import com.example.majo.persistence.IMappedPointsPersistence;
+import com.example.majo.persistenceLocalDatabase.IDrawingPointPersistence;
+import com.example.majo.persistenceLocalDatabase.IGeoSessionPersistence;
+import com.example.majo.persistenceLocalDatabase.IMappedPointsPersistence;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

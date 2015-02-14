@@ -13,5 +13,5 @@ public class SchemaMapDto  {
     public Date dateCreated;
     public byte[] thumbnailImage;
 
-    public List<MappedPointDto> mappedPoints;
+    public int version;
 }

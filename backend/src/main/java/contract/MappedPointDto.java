@@ -6,12 +6,13 @@ package contract;
 public class MappedPointDto {
 
     public Long id;
+    public Long schemaMapId;
 
     public float x;
     public float y;
     public float radius;
 
-    public float Latitude;
-    public float Longitude;
-    public float Altitude;
+    public float latitude;
+    public float longitude;
+    public float altitude;
 }

@@ -1,8 +1,7 @@
 package com.example.majo.BusinessObjects;
 
-import com.example.majo.persistence.IGeoLocationPersistence;
+import com.example.majo.persistenceLocalDatabase.IGeoLocationPersistence;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

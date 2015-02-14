@@ -13,8 +13,9 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>com.example.majo.myapplication.backend.SchemaMapStorageEndpoint,
-                com.example.majo.myapplication.backend.MappedPointEntityEndpoint</param-value>
+            <param-value>
+                com.example.majo.myapplication.backend.MappedPointEntityEndpoint,
+                com.example.majo.myapplication.backend.SchemaMapEntityEndpoint</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

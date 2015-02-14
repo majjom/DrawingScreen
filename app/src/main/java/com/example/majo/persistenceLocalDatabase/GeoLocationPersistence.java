@@ -1,11 +1,9 @@
-package com.example.majo.persistence;
+package com.example.majo.persistenceLocalDatabase;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 
 import com.example.majo.BusinessObjects.GeoLocation;
-import com.example.majo.BusinessObjects.MappedPoint;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,34 +10,24 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.example.majo.Adapters.SimpleDeleteListAdapter;
-import com.example.majo.BusinessObjects.MappedPoint;
-import com.example.majo.GoogleMap.LocationConverter;
 import com.example.majo.distance.DistanceCalculator;
 import com.example.majo.distance.DistancePoint;
 import com.example.majo.drawingscreen.DrawingScreenView;
-import com.example.majo.drawingscreen.IOnPointChanged;
 import com.example.majo.drawingscreen.Layer;
 import com.example.majo.drawingscreen.MappedPointManager;
 import com.example.majo.drawingscreen.R;
 import com.example.majo.helper.NavigationContext;
 import com.example.majo.maps.MapManager;
-import com.example.majo.persistence.DatabaseConnection;
-import com.example.majo.persistence.DrawingPointPersistence;
-import com.example.majo.persistence.IDatabaseConnection;
-import com.example.majo.persistence.IDrawingPointPersistence;
-import com.example.majo.persistence.IMappedPointsPersistence;
-import com.example.majo.persistence.MappedPointsPersistence;
+import com.example.majo.persistenceLocalDatabase.DatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.IDatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.IMappedPointsPersistence;
+import com.example.majo.persistenceLocalDatabase.MappedPointsPersistence;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TrackingActivity extends Activity implements LocationListener {

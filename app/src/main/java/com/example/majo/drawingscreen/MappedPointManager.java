@@ -2,13 +2,10 @@ package com.example.majo.drawingscreen;
 
 import android.graphics.Color;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
-import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.BusinessObjects.MappedPoint;
-import com.example.majo.persistence.IDrawingPointPersistence;
-import com.example.majo.persistence.IMappedPointsPersistence;
+import com.example.majo.persistenceLocalDatabase.IMappedPointsPersistence;
 
 import java.util.ArrayList;
 import java.util.List;

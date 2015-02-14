@@ -16,23 +16,20 @@ import android.widget.Toast;
 
 import com.example.majo.Activities.GeoLocationsMapsActivity;
 import com.example.majo.maps.MapManager;
-import com.example.majo.maps.SchemaMapListActivity;
 import com.example.majo.Adapters.SimpleDeleteListAdapter;
 import com.example.majo.BusinessObjects.DrawingPoint;
 import com.example.majo.Activities.GeoSessionsListActivity;
 import com.example.majo.BusinessObjects.MappedPoint;
 import com.example.majo.helper.NavigationContext;
 import com.example.majo.merging.PointMerge;
-import com.example.majo.persistence.DatabaseConnection;
-import com.example.majo.persistence.DrawingPointPersistence;
-import com.example.majo.persistence.GeoLocationPersistence;
-import com.example.majo.persistence.IDatabaseConnection;
-import com.example.majo.persistence.IDrawingPointPersistence;
-import com.example.majo.persistence.IMappedPointsPersistence;
-import com.example.majo.persistence.MappedPointsPersistence;
+import com.example.majo.persistenceLocalDatabase.DatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.DrawingPointPersistence;
+import com.example.majo.persistenceLocalDatabase.GeoLocationPersistence;
+import com.example.majo.persistenceLocalDatabase.IDatabaseConnection;
+import com.example.majo.persistenceLocalDatabase.IDrawingPointPersistence;
+import com.example.majo.persistenceLocalDatabase.IMappedPointsPersistence;
+import com.example.majo.persistenceLocalDatabase.MappedPointsPersistence;
 import com.example.majo.trackingscreen.TrackingActivity;
-
-import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.List;
