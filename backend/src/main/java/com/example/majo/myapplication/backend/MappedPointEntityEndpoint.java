@@ -1,5 +1,7 @@
 package com.example.majo.myapplication.backend;
 
+import com.example.majo.myapplication.entities.MappedPointEntity;
+import com.example.majo.myapplication.entities.SchemaMapEntity;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
@@ -12,8 +14,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.inject.Named;
-
-import contract.MappedPointDto;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -44,9 +44,9 @@ public class MappedPointEntityEndpoint {
     }
 
     /**
-     * Returns list of {@link MappedPointEntity} for given for given {@link SchemaMapEntity} identified by Id .
+     * Returns list of {@link MappedPointEntity} for given for given {@link com.example.majo.myapplication.entities.SchemaMapEntity} identified by Id .
      *
-     * @param mapId the ID of the {@link SchemaMapEntity} which is parent of all {@link MappedPointEntity} which will be retrieved
+     * @param mapId the ID of the {@link com.example.majo.myapplication.entities.SchemaMapEntity} which is parent of all {@link MappedPointEntity} which will be retrieved
      * @return the list of {@link MappedPointEntity} that are children of map id.
      */
     @ApiMethod(
@@ -64,7 +64,7 @@ public class MappedPointEntityEndpoint {
     }
 
     /**
-     * Saves a {@code MappedPointEntity}. Assuming the parent {@link SchemaMapEntity} is part of the specified entity.
+     * Saves a {@code MappedPointEntity}. Assuming the parent {@link com.example.majo.myapplication.entities.SchemaMapEntity} is part of the specified entity.
      */
     @ApiMethod(
             name = "save",
@@ -78,9 +78,9 @@ public class MappedPointEntityEndpoint {
     }
 
     /**
-     * Deletes all children of {@link MappedPointEntity} for given {@link SchemaMapEntity} identified by Id.
+     * Deletes all children of {@link MappedPointEntity} for given {@link com.example.majo.myapplication.entities.SchemaMapEntity} identified by Id.
      *
-     * @param mapId the ID of the {@link SchemaMapEntity}
+     * @param mapId the ID of the {@link com.example.majo.myapplication.entities.SchemaMapEntity}
      */
     @ApiMethod(
             name = "deleteAllForMapId",

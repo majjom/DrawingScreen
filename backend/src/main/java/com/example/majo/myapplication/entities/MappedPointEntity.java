@@ -1,11 +1,11 @@
-package com.example.majo.myapplication.backend;
+package com.example.majo.myapplication.entities;
 
 
+import com.example.majo.myapplication.entities.SchemaMapEntity;
 import com.google.appengine.api.datastore.GeoPt;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.Index;
 
 /**

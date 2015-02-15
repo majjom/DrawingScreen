@@ -1,4 +1,4 @@
-package com.example.majo.myapplication.backend;
+package com.example.majo.myapplication.entities;
 
 import com.google.appengine.api.datastore.Blob;
 import com.googlecode.objectify.annotation.Entity;
@@ -18,7 +18,6 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class SchemaMapEntity {
     public static final String PROPERTY_NAME = "name";
 
-
     @Id
     public Long id;
     @Index
@@ -26,6 +25,8 @@ public class SchemaMapEntity {
     public Date dateCreated;
     public byte[] thumbnailImage;
     public int version;
+    public String imageBlobKey;
+    public String imageBlobServingUrl;
 
     public SchemaMapEntity(){
         super();

@@ -1,4 +1,4 @@
-package contract;
+package com.example.majo.myapplication.backend;
 
 import java.util.Date;
 import java.util.List;
@@ -14,4 +14,7 @@ public class SchemaMapDto  {
     public byte[] thumbnailImage;
 
     public int version;
+
+    public String imageBlobKey;
+    public String imageBlobServingUrl;
 }

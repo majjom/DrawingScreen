@@ -1,4 +1,4 @@
-package contract;
+package com.example.majo.myapplication.backend;
 
 /**
  * Created by majo on 03-Feb-15.

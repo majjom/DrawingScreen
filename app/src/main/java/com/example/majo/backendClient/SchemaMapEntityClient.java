@@ -1,9 +1,7 @@
 package com.example.majo.backendClient;
 
-
 import com.example.majo.myapplication.backend.schemaMapEntityApi.SchemaMapEntityApi;
 import com.example.majo.myapplication.backend.schemaMapEntityApi.model.SchemaMapDto;
-import com.example.majo.myapplication.backend.schemaMapEntityApi.model.SchemaMapEntity;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
@@ -42,9 +40,9 @@ public class SchemaMapEntityClient {
     }
 
 
-    public List<SchemaMapDto> getByName(String name) {
+    public List<SchemaMapDto> getByNamePrefix(String name) {
         try {
-            return this.myApiService.getByName(name).execute().getItems();
+            return this.myApiService.getByNamePrefix(name).execute().getItems();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,7 +58,6 @@ public class SchemaMapEntityClient {
         return null;
     }
 
-
     public SchemaMapDto save(SchemaMapDto schemaMap) {
         try {
             return this.myApiService.save(schemaMap).execute();
@@ -69,7 +66,6 @@ public class SchemaMapEntityClient {
         }
         return null;
     }
-
 
     public void delete(Long id) {
         try {

@@ -1,23 +1,17 @@
 package com.example.majo.myapplication.backend;
 
+import com.example.majo.myapplication.entities.SchemaMapEntity;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.api.server.spi.response.CollectionResponse;
 import com.google.api.server.spi.response.NotFoundException;
-import com.google.appengine.api.datastore.Cursor;
-import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.annotation.Nullable;
 import javax.inject.Named;
-
-import contract.SchemaMapDto;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -66,17 +60,20 @@ public class SchemaMapEntityEndpoint {
     }
 
     /**
-     * Returns the list of {@link SchemaMapEntity} with the corresponding name.
+     * Returns the list of {@link SchemaMapEntity} with the corresponding name prefix.
      *
      * @param name the name of the entities to be retrieved
      * @return the entity with the corresponding ID
      */
     @ApiMethod(
-            name = "getByName")
-    public List<SchemaMapDto> getByName(@Named("name") String name)  {
+            name = "getByNamePrefix")
+    public List<SchemaMapDto> getByNamePrefix(@Named("name") String name)  {
         logger.info("Getting SchemaMapEntity with name: " + name);
         List<SchemaMapDto> result = new ArrayList<>();
-        for(SchemaMapEntity schemaMapEntity : ofy().load().type(SchemaMapEntity.class).filter(SchemaMapEntity.PROPERTY_NAME, name).list()){
+        for(SchemaMapEntity schemaMapEntity : ofy().load().type(SchemaMapEntity.class)
+                .filter(SchemaMapEntity.PROPERTY_NAME + " >=" , name)
+                .filter(SchemaMapEntity.PROPERTY_NAME + " <", name + "\ufffd")
+                .list()){
             result.add(convertToDto(schemaMapEntity));
         }
         return result;
@@ -119,6 +116,8 @@ public class SchemaMapEntityEndpoint {
         result.name = schemaMapEntity.name;
         result.thumbnailImage = schemaMapEntity.thumbnailImage;
         result.version = schemaMapEntity.version;
+        result.imageBlobKey = schemaMapEntity.imageBlobKey;
+        result.imageBlobServingUrl = schemaMapEntity.imageBlobServingUrl;
         return result;
     }
 
@@ -129,6 +128,8 @@ public class SchemaMapEntityEndpoint {
         result.name = schemaMapDto.name;
         result.thumbnailImage = schemaMapDto.thumbnailImage;
         result.version = schemaMapDto.version;
+        result.imageBlobKey = schemaMapDto.imageBlobKey;
+        result.imageBlobServingUrl = schemaMapDto.imageBlobServingUrl;
         return result;
     }
 }

@@ -1,13 +1,7 @@
 package com.example.majo.backendClient;
 
-import com.example.majo.BusinessObjects.MappedPoint;
-import com.example.majo.BusinessObjects.SchemaMap;
 import com.example.majo.myapplication.backend.mappedPointEntityApi.MappedPointEntityApi;
 import com.example.majo.myapplication.backend.mappedPointEntityApi.model.MappedPointDto;
-import com.example.majo.myapplication.backend.mappedPointEntityApi.model.MappedPointEntity;
-import com.example.majo.myapplication.backend.schemaMapEntityApi.SchemaMapEntityApi;
-import com.example.majo.myapplication.backend.schemaMapEntityApi.model.SchemaMapDto;
-import com.example.majo.myapplication.backend.schemaMapEntityApi.model.SchemaMapEntity;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;

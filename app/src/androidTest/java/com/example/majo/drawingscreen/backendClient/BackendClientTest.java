@@ -2,12 +2,12 @@ package com.example.majo.drawingscreen.backendClient;
 
 import android.test.InstrumentationTestCase;
 
+import com.example.majo.backendClient.BlobStoreImageClient;
 import com.example.majo.backendClient.MappedPointEntityClient;
 import com.example.majo.backendClient.SchemaMapEntityClient;
+import com.example.majo.maps.MapManager;
 import com.example.majo.myapplication.backend.mappedPointEntityApi.model.MappedPointDto;
-import com.example.majo.myapplication.backend.mappedPointEntityApi.model.MappedPointEntity;
 import com.example.majo.myapplication.backend.schemaMapEntityApi.model.SchemaMapDto;
-import com.example.majo.myapplication.backend.schemaMapEntityApi.model.SchemaMapEntity;
 import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
@@ -64,6 +64,40 @@ public class BackendClientTest extends InstrumentationTestCase {
 
         // assert
         assertNull(client.getById(savedSchemaMapDto.getId()));
+    }
+
+    public void testSchemaMapClient_getByNamePrefix(){
+        SchemaMapEntityClient client = new SchemaMapEntityClient(true);
+
+        // pre -arrange
+        String name = "myName";
+        List<SchemaMapDto> leftovers = client.getByNamePrefix(name);
+        for (SchemaMapDto leftover : leftovers){
+            client.delete(leftover.getId());
+        }
+
+        // arrange
+        String name01 = name + "01";
+        String name02 = name + "02";
+
+        SchemaMapDto schemaMapDto = new SchemaMapDto();
+        schemaMapDto.setName(name01);
+        schemaMapDto.setDateCreated(new DateTime(new Date()));
+        schemaMapDto.setThumbnailImage("aaaa");
+        SchemaMapDto savedSchemaMapDto = client.save(schemaMapDto);
+
+        schemaMapDto.setName(name02);
+        SchemaMapDto savedSchemaMapDto2 = client.save(schemaMapDto);
+
+        // act
+        List<SchemaMapDto> result = client.getByNamePrefix(name);
+        List<SchemaMapDto> result01 = client.getByNamePrefix(name01);
+        List<SchemaMapDto> result02 = client.getByNamePrefix(name02);
+
+        // assert
+        assertEquals(1, result01.size());
+        assertEquals(1, result02.size());
+        assertEquals(2, result.size());
     }
 
     public void testMappedPointClient(){
